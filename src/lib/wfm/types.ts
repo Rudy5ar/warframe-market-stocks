@@ -1,10 +1,8 @@
 /**
- * Types for the Warframe.market v1 REST API.
+ * Types for Warframe.market API access.
  *
- * v1 (`https://api.warframe.market/v1`) is deprecated in favor of v2, but v2
- * does not expose per-item trade statistics (`/statistics`), so v1 is kept
- * around specifically for that endpoint (and for items/orders, which v1 still
- * serves fine).
+ * Items + orders use v2; statistics still use v1. Internal shapes are normalized
+ * to a stable app-facing contract (`url_name`, `order_type`, snake_case user fields).
  */
 
 export type WfmOrderType = "buy" | "sell";
@@ -65,4 +63,38 @@ export interface WfmStatisticsWindow {
 export interface WfmItemStatistics {
   statistics_closed: WfmStatisticsWindow;
   statistics_live: WfmStatisticsWindow;
+}
+
+/** Raw v2 catalog item (subset we care about). */
+export interface WfmV2Item {
+  id: string;
+  slug: string;
+  i18n?: {
+    en?: {
+      name?: string;
+      icon?: string;
+      thumb?: string;
+    };
+  };
+}
+
+/** Raw v2 order (subset we care about). */
+export interface WfmV2Order {
+  id: string;
+  type: WfmOrderType;
+  platinum: number;
+  quantity: number;
+  visible: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  user: {
+    id: string;
+    ingameName: string;
+    status: WfmUserStatus;
+    reputation: number;
+    platform?: string;
+    locale?: string;
+    avatar?: string;
+    lastSeen?: string;
+  };
 }

@@ -1,12 +1,12 @@
-import { wfmRequest } from "./client";
+import { wfmRequestV1 } from "./client";
 import type { WfmItemStatistics } from "./types";
 
 /**
- * Fetches trade statistics (closed + live, 48h/90d) for an item.
- * This endpoint only exists in v1 - it has no v2 equivalent.
+ * Fetches trade statistics for an item (API v1 — still required; v2 has no
+ * per-item statistics endpoint yet).
  */
 export async function getItemStatistics(
-  urlName: string
+  urlName: string,
 ): Promise<WfmItemStatistics> {
-  return wfmRequest<WfmItemStatistics>(`/items/${urlName}/statistics`);
+  return wfmRequestV1<WfmItemStatistics>(`/items/${urlName}/statistics`);
 }

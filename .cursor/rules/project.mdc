@@ -13,7 +13,8 @@ Personal platinum flip / price-drop monitor. Free-tier only.
 - Deploy: Vercel Hobby + GitHub Actions cron (every 3–4h), not Vercel `*/30` cron
 
 ## Hard constraints
-- WFM API ≤ 3 req/s; descriptive `User-Agent` (`WFM_USER_AGENT`)
+- WFM API ≤ 3 req/s; descriptive `User-Agent` (`WFM_USER_AGENT`); send `Platform: pc`
+- Items + orders: **API v2**; statistics: **API v1** (no v2 equivalent yet)
 - Serverless: small batches + `scan_cursor` + self-chain; do not hold one long scan
 - Store latest snapshot + ≤7d history; prune aggressively (500 MB DB)
 - Cron protected by `CRON_SECRET`; no multi-user auth in MVP
