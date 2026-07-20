@@ -58,3 +58,35 @@ export interface WfmItemStatistics {
   statistics_closed: WfmStatisticsWindow;
   statistics_live: WfmStatisticsWindow;
 }
+
+export interface WfmV2Item {
+  id: string;
+  slug: string;
+  i18n?: {
+    en?: {
+      name?: string;
+      icon?: string;
+      thumb?: string;
+    };
+  };
+}
+
+export interface WfmV2Order {
+  id: string;
+  type: WfmOrderType;
+  platinum: number;
+  quantity: number;
+  visible: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+  user: {
+    id: string;
+    ingameName: string;
+    status: WfmUserStatus;
+    reputation: number;
+    platform?: string;
+    locale?: string;
+    avatar?: string;
+    lastSeen?: string;
+  };
+}

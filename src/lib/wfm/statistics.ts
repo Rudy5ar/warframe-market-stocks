@@ -1,8 +1,8 @@
-import { wfmRequest } from "./client";
+import { wfmRequestV1 } from "./client";
 import type { WfmItemStatistics } from "./types";
 
 export async function getItemStatistics(
-  urlName: string
+  urlName: string,
 ): Promise<WfmItemStatistics> {
-  return wfmRequest<WfmItemStatistics>(`/items/${urlName}/statistics`);
+  return wfmRequestV1<WfmItemStatistics>(`/items/${urlName}/statistics`);
 }

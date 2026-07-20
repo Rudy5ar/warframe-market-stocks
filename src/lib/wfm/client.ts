@@ -2,8 +2,10 @@ import "server-only";
 
 import { wfmRateLimiter } from "./rateLimiter";
 
-const WFM_BASE_URL = "https://api.warframe.market/v1";
+const WFM_V1_BASE_URL = "https://api.warframe.market/v1";
+const WFM_V2_BASE_URL = "https://api.warframe.market/v2";
 const WFM_LANGUAGE = "en";
+const WFM_PLATFORM = "pc";
 const WFM_FETCH_TIMEOUT_MS = 15_000;
 
 const MAX_RETRIES = 5;
@@ -13,7 +15,7 @@ export class WfmApiError extends Error {
   constructor(
     message: string,
     public readonly status: number,
-    public readonly url: string
+    public readonly url: string,
   ) {
     super(message);
     this.name = "WfmApiError";
@@ -28,7 +30,7 @@ function getUserAgent(): string {
   const userAgent = process.env.WFM_USER_AGENT;
   if (!userAgent) {
     throw new Error(
-      "WFM_USER_AGENT env var is required to call the Warframe.market API"
+      "WFM_USER_AGENT env var is required to call the Warframe.market API",
     );
   }
   return userAgent;
@@ -45,11 +47,16 @@ function retryDelayMs(res: Response, attempt: number): number {
   return BASE_RETRY_DELAY_MS * 2 ** attempt;
 }
 
-export async function wfmRequest<TPayload>(path: string): Promise<TPayload> {
-  const url = `${WFM_BASE_URL}${path}`;
+async function wfmFetch<TBody>(
+  baseUrl: string,
+  path: string,
+  unwrap: (json: unknown) => TBody,
+): Promise<TBody> {
+  const url = `${baseUrl}${path}`;
   const headers = {
     Accept: "application/json",
     Language: WFM_LANGUAGE,
+    Platform: WFM_PLATFORM,
     "User-Agent": getUserAgent(),
   };
 
@@ -72,9 +79,33 @@ export async function wfmRequest<TPayload>(path: string): Promise<TPayload> {
       throw new WfmApiError(`WFM request failed: ${res.status}`, res.status, url);
     }
 
-    const json = (await res.json()) as { payload: TPayload };
-    return json.payload;
+    const json: unknown = await res.json();
+    return unwrap(json);
   }
 
   throw new WfmApiError("WFM request failed", 0, url);
+}
+
+export async function wfmRequestV2<TData>(path: string): Promise<TData> {
+  return wfmFetch(WFM_V2_BASE_URL, path, (json) => {
+    const body = json as { data?: TData; error?: unknown };
+    if (body.data === undefined) {
+      throw new WfmApiError("WFM v2 response missing data", 0, `${WFM_V2_BASE_URL}${path}`);
+    }
+    return body.data;
+  });
+}
+
+export async function wfmRequestV1<TPayload>(path: string): Promise<TPayload> {
+  return wfmFetch(WFM_V1_BASE_URL, path, (json) => {
+    const body = json as { payload?: TPayload };
+    if (body.payload === undefined) {
+      throw new WfmApiError("WFM v1 response missing payload", 0, `${WFM_V1_BASE_URL}${path}`);
+    }
+    return body.payload;
+  });
+}
+
+export async function wfmRequest<TPayload>(path: string): Promise<TPayload> {
+  return wfmRequestV1(path);
 }
