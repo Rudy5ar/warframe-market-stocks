@@ -20,13 +20,21 @@ export const dynamic = "force-dynamic";
 
 /** Wall-clock budget per invocation before we stop starting new work (Vercel Hobby ~60s cap). */
 const TIME_BUDGET_MS = 45_000;
-/** Only the root invocation (chain=0) guards against overlapping triggers; a chained child trusts its caller. */
-const RUNNING_LOCK_WINDOW_MS = 5 * 60 * 1000;
+/**
+ * Soft lock: reject new root triggers while status=running and last_run_at is
+ * newer than this. After the window, treat as stuck and allow takeover.
+ */
+const RUNNING_LOCK_WINDOW_MS = 15 * 60 * 1000;
 /** Watchlist pins are considered stale after this long — roughly one scan.yml cycle (every 4h). */
 const WATCHLIST_STALE_MS = 3 * 60 * 60 * 1000;
 const HISTORY_RETENTION_DAYS = 7;
-/** ?chain=<depth> counts self-chains; a chained invocation (depth 1) never chains again. */
-const MAX_SELF_CHAIN_DEPTH = 1;
+/** Max in-process follow-up batches after the first (no HTTP self-chain). */
+const MAX_EXTRA_BATCHES = 1;
+/**
+ * Watchlist may fill at most this fraction of a batch so catalog cursor still
+ * advances when many pins are stale (Bugbot: watchlist starvation).
+ */
+const WATCHLIST_BATCH_FRACTION = 0.5;
 
 function envInt(name: string, fallback: number): number {
   const raw = process.env[name];
@@ -268,7 +276,8 @@ async function runScanBatch(
     };
   }
 
-  const watchlistBatch = await buildWatchlistBatch(supabase, batchSize);
+  const watchlistCap = Math.max(0, Math.floor(batchSize * WATCHLIST_BATCH_FRACTION));
+  const watchlistBatch = await buildWatchlistBatch(supabase, watchlistCap);
   const remaining = Math.max(0, batchSize - watchlistBatch.length);
 
   // Cursor may be stale (catalog shrank since last run) — restart the page from 0.
@@ -353,16 +362,29 @@ async function setCursorStatus(
     .eq("id", 1);
 }
 
+function mergeSummaries(
+  a: ScanBatchSummary,
+  b: ScanBatchSummary,
+): ScanBatchSummary {
+  return {
+    watchlistScanned: a.watchlistScanned + b.watchlistScanned,
+    generalScanned: a.generalScanned + b.generalScanned,
+    spreadAlerts: a.spreadAlerts + b.spreadAlerts,
+    priceDropAlerts: a.priceDropAlerts + b.priceDropAlerts,
+    errors: [...a.errors, ...b.errors],
+    offset: b.offset,
+    total: b.total,
+    cycleCompleted: a.cycleCompleted || b.cycleCompleted,
+    pruned: b.pruned ?? a.pruned,
+  };
+}
+
 async function handleScan(request: Request): Promise<NextResponse> {
   if (!isAuthorizedCronRequest(request)) {
     return NextResponse.json({ ok: false, error: "Unauthorized" }, { status: 401 });
   }
 
   const startedAt = Date.now();
-  const requestUrl = new URL(request.url);
-  const parsedChain = Number.parseInt(requestUrl.searchParams.get("chain") ?? "0", 10);
-  const chainDepthValue = Number.isFinite(parsedChain) ? parsedChain : 0;
-
   const supabase = createServiceClient();
 
   const { data: cursorRow, error: cursorFetchError } = await supabase
@@ -379,7 +401,6 @@ async function handleScan(request: Request): Promise<NextResponse> {
   }
 
   if (
-    chainDepthValue === 0 &&
     cursorRow.status === "running" &&
     cursorRow.last_run_at &&
     Date.now() - new Date(cursorRow.last_run_at).getTime() < RUNNING_LOCK_WINDOW_MS
@@ -396,27 +417,18 @@ async function handleScan(request: Request): Promise<NextResponse> {
   const thresholds = readThresholds();
 
   try {
-    const summary = await runScanBatch(supabase, batchSize, thresholds, cursorRow.offset);
+    let summary = await runScanBatch(supabase, batchSize, thresholds, cursorRow.offset);
+    let extraBatches = 0;
 
-    let chained = false;
-    let chainResult: unknown = null;
-    const hasMoreWork = summary.total > 0;
-    const withinBudget = Date.now() - startedAt < TIME_BUDGET_MS;
-
-    if (hasMoreWork && withinBudget && chainDepthValue < MAX_SELF_CHAIN_DEPTH) {
-      const chainUrl = new URL(requestUrl.toString());
-      chainUrl.searchParams.set("chain", String(chainDepthValue + 1));
-
-      try {
-        const chainResponse = await fetch(chainUrl.toString(), {
-          method: "POST",
-          headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
-        });
-        chained = true;
-        chainResult = await chainResponse.json().catch(() => null);
-      } catch (err) {
-        chainResult = { ok: false, error: err instanceof Error ? err.message : String(err) };
-      }
+    // In-process follow-up batch (no HTTP ?chain= bypass / nested serverless await).
+    while (
+      extraBatches < MAX_EXTRA_BATCHES &&
+      summary.total > 0 &&
+      Date.now() - startedAt < TIME_BUDGET_MS
+    ) {
+      const next = await runScanBatch(supabase, batchSize, thresholds, summary.offset);
+      summary = mergeSummaries(summary, next);
+      extraBatches += 1;
     }
 
     await setCursorStatus(supabase, "idle");
@@ -433,9 +445,7 @@ async function handleScan(request: Request): Promise<NextResponse> {
       cycleCompleted: summary.cycleCompleted,
       pruned: summary.pruned,
       errors: summary.errors,
-      chained,
-      chainResult,
-      chainDepth: chainDepthValue,
+      extraBatches,
     });
   } catch (err) {
     await setCursorStatus(supabase, "error");
