@@ -27,5 +27,9 @@ Personal platinum flip / price-drop monitor. Free-tier only.
 - Price drop: `lowest_sell < median_48h * 0.85`; 24h alert dedupe
 - Stats only when needed for price-drop (or every Nth full cycle)
 
+## Scan / watchlist
+- `watchlist` may list `url_name`s before they exist in `items`; cron must only snapshot names present in `items` (skip orphans until manifest sync).
+- Keep scan single-threaded per invocation (in-process WFM rate limiter is not global across lambdas).
+
 ## Orchestration
 Large work uses `plan-orchestrator`. Prefer phases: foundation → scanner → dashboard → Discord later.
