@@ -1,0 +1,25 @@
+# Primary scan scheduler (free tier). Runs every 4 hours on the hour (UTC).
+# Backup: vercel.json daily cron at 06:00 UTC (Hobby 1/day limit).
+# Phase 2 /api/cron/scan must accept: Authorization: Bearer <CRON_SECRET>
+#
+# Repo secrets: APP_URL (no trailing slash), CRON_SECRET (same value as Vercel env)
+name: Scan cron
+
+on:
+  schedule:
+    # Every 4 hours: 00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC
+    - cron: "0 */4 * * *"
+  workflow_dispatch:
+
+jobs:
+  trigger-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - name: POST /api/cron/scan
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            "${APP_URL}/api/cron/scan"
