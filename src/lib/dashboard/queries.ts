@@ -12,6 +12,19 @@ import type {
   WatchlistRow,
 } from "./types";
 
+function envFloat(name: string, fallback: number): number {
+  const raw = process.env[name];
+  const parsed = raw !== undefined ? Number.parseFloat(raw) : NaN;
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function opportunityThresholds() {
+  return {
+    minSpread: envFloat("MIN_SPREAD", DEFAULT_SPREAD_THRESHOLDS.minSpread),
+    minRoiPct: envFloat("MIN_ROI_PCT", DEFAULT_SPREAD_THRESHOLDS.minRoiPct),
+  };
+}
+
 /**
  * Thin data-access layer for the dashboard UI. Queries are written as
  * separate lookups (snapshots/alerts/watchlist first, `items` second) rather
@@ -43,19 +56,20 @@ async function fetchItemNamesByUrlName(
   return map;
 }
 
-/** Top flips ranked by ROI% or spread, filtered to default spread/ROI thresholds. */
+/** Top flips ranked by ROI% or spread, filtered to scan-aligned spread/ROI thresholds. */
 export async function getTopOpportunities(
   limit = 20,
   sort: "roi" | "spread" = "roi",
 ): Promise<OpportunityRow[]> {
   const supabase = createServiceClient();
   const orderColumn = sort === "spread" ? "spread" : "roi_pct";
+  const { minSpread, minRoiPct } = opportunityThresholds();
 
   const { data, error } = await supabase
     .from("item_snapshots")
     .select("url_name, lowest_sell, highest_buy, spread, roi_pct, volume_48h, scanned_at")
-    .gte("spread", DEFAULT_SPREAD_THRESHOLDS.minSpread)
-    .gte("roi_pct", DEFAULT_SPREAD_THRESHOLDS.minRoiPct)
+    .gte("spread", minSpread)
+    .gte("roi_pct", minRoiPct)
     .order(orderColumn, { ascending: false })
     .limit(limit);
 
@@ -208,30 +222,33 @@ export async function getScanStatus(): Promise<ScanStatusSummary> {
 /** Full detail for `/items/[urlName]`. Returns `null` if the item is unknown everywhere. */
 export async function getItemDetail(urlName: string): Promise<ItemDetail | null> {
   const supabase = createServiceClient();
+  // WFM url_names and watchlist pins are stored lowercase; normalize route params.
+  const normalized = urlName.trim().toLowerCase();
+  if (!normalized) return null;
 
   const [itemResult, snapshotResult, historyResult, watchlistResult, alertsResult] =
     await Promise.all([
       supabase
         .from("items")
         .select("url_name, item_name, thumb")
-        .eq("url_name", urlName)
+        .eq("url_name", normalized)
         .maybeSingle(),
       supabase
         .from("item_snapshots")
         .select("lowest_sell, highest_buy, spread, roi_pct, median_48h, volume_48h, scanned_at")
-        .eq("url_name", urlName)
+        .eq("url_name", normalized)
         .maybeSingle(),
       supabase
         .from("item_snapshot_history")
         .select("scanned_at, lowest_sell, highest_buy, spread, roi_pct, median_48h, volume_48h")
-        .eq("url_name", urlName)
+        .eq("url_name", normalized)
         .order("scanned_at", { ascending: false })
         .limit(50),
-      supabase.from("watchlist").select("url_name").eq("url_name", urlName).maybeSingle(),
+      supabase.from("watchlist").select("url_name").eq("url_name", normalized).maybeSingle(),
       supabase
         .from("alerts")
         .select("id, type, url_name, payload, alert_day, created_at")
-        .eq("url_name", urlName)
+        .eq("url_name", normalized)
         .order("created_at", { ascending: false })
         .limit(20),
     ]);
@@ -249,7 +266,7 @@ export async function getItemDetail(urlName: string): Promise<ItemDetail | null>
     return null;
   }
 
-  const itemName = item?.item_name ?? urlName;
+  const itemName = item?.item_name ?? normalized;
   const history: HistoryPoint[] = (historyResult.data ?? []).map((row) => ({
     scannedAt: row.scanned_at,
     lowestSell: row.lowest_sell,
@@ -271,7 +288,7 @@ export async function getItemDetail(urlName: string): Promise<ItemDetail | null>
   }));
 
   return {
-    urlName,
+    urlName: normalized,
     itemName,
     thumb: item?.thumb ?? null,
     exists: Boolean(item),
