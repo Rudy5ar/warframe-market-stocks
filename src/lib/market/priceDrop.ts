@@ -1,0 +1,31 @@
+import type { WfmItemStatistics } from "@/lib/wfm";
+
+export const PRICE_DROP_RATIO = 0.85;
+
+export function computeMedian48h(statistics: WfmItemStatistics): number | null {
+  const activePoints = statistics.statistics_closed["48hours"].filter(
+    (entry) => entry.volume > 0,
+  );
+
+  if (activePoints.length === 0) {
+    return null;
+  }
+
+  const medians = activePoints.map((entry) => entry.median).sort((a, b) => a - b);
+  const mid = Math.floor(medians.length / 2);
+
+  return medians.length % 2 === 0
+    ? (medians[mid - 1] + medians[mid]) / 2
+    : medians[mid];
+}
+
+export function isPriceDrop(
+  lowestSell: number | null,
+  median48h: number | null,
+): boolean {
+  if (lowestSell === null || median48h === null) {
+    return false;
+  }
+
+  return lowestSell < median48h * PRICE_DROP_RATIO;
+}
