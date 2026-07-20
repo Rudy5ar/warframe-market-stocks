@@ -1,26 +1,90 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Void steel / cold platinum palette */
+  --void: #0b0d0e;
+  --void-raised: #121516;
+  --void-panel: #171b1d;
+  --line: #262c2f;
+  --line-strong: #363e41;
+
+  --platinum: #e8edee;
+  --platinum-dim: #a8b3b5;
+  --platinum-faint: #6b7679;
+
+  --teal: #3ecfb8;
+  --teal-dim: #1f7568;
+  --amber: #e2a13d;
+  --amber-dim: #7a5a24;
+  --red: #d9705a;
+
+  --background: var(--void);
+  --foreground: var(--platinum);
 }
 
 @theme inline {
+  --color-void: var(--void);
+  --color-void-raised: var(--void-raised);
+  --color-void-panel: var(--void-panel);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+
+  --color-platinum: var(--platinum);
+  --color-platinum-dim: var(--platinum-dim);
+  --color-platinum-faint: var(--platinum-faint);
+
+  --color-teal: var(--teal);
+  --color-teal-dim: var(--teal-dim);
+  --color-amber: var(--amber);
+  --color-amber-dim: var(--amber-dim);
+  --color-red: var(--red);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+
+  --font-sans: var(--font-outfit);
+  --font-display: var(--font-syne);
+  --font-mono: var(--font-plex-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  border-color: var(--line);
+}
+
+html {
+  color-scheme: dark;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: var(--teal-dim);
+  color: var(--platinum);
+}
+
+/* Thin scrollbars for horizontally-scrolling tables on mobile */
+.scroll-thin::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+.scroll-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+.scroll-thin::-webkit-scrollbar-thumb {
+  background: var(--line-strong);
+  border-radius: 3px;
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-display);
+  }
+  .font-mono-num {
+    font-family: var(--font-mono);
+    font-feature-settings: "tnum" 1;
+  }
 }
