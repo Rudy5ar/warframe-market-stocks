@@ -1,0 +1,31 @@
+---
+description: Warframe Market Stocks — product constraints and architecture
+alwaysApply: true
+---
+
+# Warframe Market Stocks
+
+Personal platinum flip / price-drop monitor. Free-tier only.
+
+## Stack
+- Next.js 15 App Router + TypeScript + Tailwind (`src/`)
+- Supabase Postgres (no Redis/Upstash)
+- Deploy: Vercel Hobby + GitHub Actions cron (every 3–4h), not Vercel `*/30` cron
+
+## Hard constraints
+- WFM API ≤ 3 req/s; descriptive `User-Agent` (`WFM_USER_AGENT`)
+- Serverless: small batches + `scan_cursor` + self-chain; do not hold one long scan
+- Store latest snapshot + ≤7d history; prune aggressively (500 MB DB)
+- Cron protected by `CRON_SECRET`; no multi-user auth in MVP
+- No marketplace UI clone, no auto-trading, no paid add-ons
+
+## Data (Supabase)
+`items`, `scan_cursor`, `item_snapshots`, `item_snapshot_history`, `alerts`, `watchlist`
+
+## Algorithms
+- Spread/ROI: online+ingame orders; defaults spread ≥ 5p, ROI ≥ 15%, min volume
+- Price drop: `lowest_sell < median_48h * 0.85`; 24h alert dedupe
+- Stats only when needed for price-drop (or every Nth full cycle)
+
+## Orchestration
+Large work uses `plan-orchestrator`. Prefer phases: foundation → scanner → dashboard → Discord later.
