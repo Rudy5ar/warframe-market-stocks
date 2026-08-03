@@ -8,6 +8,7 @@ export interface WfmItemShort {
   url_name: string;
   item_name: string;
   thumb: string;
+  tags: string[];
 }
 
 export interface WfmOrderUser {
@@ -62,6 +63,7 @@ export interface WfmItemStatistics {
 export interface WfmV2Item {
   id: string;
   slug: string;
+  tags?: string[];
   i18n?: {
     en?: {
       name?: string;
