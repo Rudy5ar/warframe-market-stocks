@@ -3,12 +3,16 @@ import "server-only";
 import { DEFAULT_SPREAD_THRESHOLDS } from "@/lib/market";
 import { createServiceClient } from "@/lib/supabase/server";
 
+import { SYNDICATES, findSyndicateMod } from "./syndicates";
+import type { SyndicateModEntry } from "./syndicates";
 import type {
   AlertRow,
   HistoryPoint,
   ItemDetail,
   OpportunityRow,
   ScanStatusSummary,
+  SyndicateAugmentRow,
+  SyndicateSection,
   WatchlistRow,
 } from "./types";
 
@@ -217,6 +221,97 @@ export async function getScanStatus(): Promise<ScanStatusSummary> {
     watchlistCount: watchlistCount.count ?? 0,
     alertsToday: alertsToday.count ?? 0,
   };
+}
+
+const ITEMS_PAGE_SIZE = 1000;
+
+interface MatchedSyndicateMod {
+  urlName: string;
+  itemName: string;
+  thumb: string | null;
+  entry: SyndicateModEntry;
+}
+
+/**
+ * All syndicate augment mods grouped by syndicate, each group sorted by current
+ * lowest sell descending (most platinum first). Prices come from scan snapshots
+ * — mods the scan hasn't reached yet sort last with null metrics.
+ *
+ * Matches `items` rows against the curated syndicate mod catalog locally
+ * (case-insensitive); the full item table is paged because PostgREST caps a
+ * single response at 1000 rows and the catalog is ~3x that.
+ */
+export async function getSyndicateAugments(): Promise<SyndicateSection[]> {
+  const supabase = createServiceClient();
+
+  const matched: MatchedSyndicateMod[] = [];
+  let pageOffset = 0;
+  for (;;) {
+    const { data, error } = await supabase
+      .from("items")
+      .select("url_name, item_name, thumb")
+      .order("url_name", { ascending: true })
+      .range(pageOffset, pageOffset + ITEMS_PAGE_SIZE - 1);
+    if (error) {
+      throw new Error(`getSyndicateAugments: ${error.message}`);
+    }
+    for (const item of data ?? []) {
+      const entry = findSyndicateMod(item.item_name);
+      if (entry) {
+        matched.push({
+          urlName: item.url_name,
+          itemName: item.item_name,
+          thumb: item.thumb,
+          entry,
+        });
+      }
+    }
+    if (!data || data.length < ITEMS_PAGE_SIZE) break;
+    pageOffset += ITEMS_PAGE_SIZE;
+  }
+
+  const urlNames = matched.map((mod) => mod.urlName);
+  const { data: snapshots, error: snapshotsError } =
+    urlNames.length === 0
+      ? { data: [], error: null }
+      : await supabase
+          .from("item_snapshots")
+          .select("url_name, lowest_sell, highest_buy, spread, roi_pct, scanned_at")
+          .in("url_name", urlNames);
+  if (snapshotsError) {
+    throw new Error(`getSyndicateAugments: ${snapshotsError.message}`);
+  }
+
+  const snapshotsByUrlName = new Map((snapshots ?? []).map((row) => [row.url_name, row]));
+
+  return SYNDICATES.map((syndicate, syndicateIndex) => {
+    const mods: SyndicateAugmentRow[] = matched
+      .filter((mod) => mod.entry.syndicates.includes(syndicateIndex))
+      .map((mod) => {
+        const snapshot = snapshotsByUrlName.get(mod.urlName);
+        return {
+          urlName: mod.urlName,
+          itemName: mod.itemName,
+          compat: mod.entry.compat,
+          thumb: mod.thumb,
+          lowestSell: snapshot?.lowest_sell ?? null,
+          highestBuy: snapshot?.highest_buy ?? null,
+          spread: snapshot?.spread ?? null,
+          roiPct: snapshot?.roi_pct ?? null,
+          scannedAt: snapshot?.scanned_at ?? null,
+        };
+      })
+      .sort(
+        (a, b) =>
+          (b.lowestSell ?? -1) - (a.lowestSell ?? -1) || a.itemName.localeCompare(b.itemName),
+      );
+
+    return {
+      syndicate,
+      mods,
+      unscanned: mods.every((mod) => mod.scannedAt === null),
+    };
+  });
 }
 
 /** Full detail for `/items/[urlName]`. Returns `null` if the item is unknown everywhere. */

@@ -10,5 +10,6 @@ export async function getItems(): Promise<WfmItemShort[]> {
     url_name: item.slug,
     item_name: item.i18n?.en?.name ?? item.slug,
     thumb: item.i18n?.en?.thumb ?? item.i18n?.en?.icon ?? "",
+    tags: item.tags ?? [],
   }));
 }

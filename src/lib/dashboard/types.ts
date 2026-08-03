@@ -59,6 +59,27 @@ export interface HistoryPoint {
   volume48h: number | null;
 }
 
+/** One augment row inside a syndicate section on `/syndicates`. */
+export interface SyndicateAugmentRow {
+  urlName: string;
+  itemName: string;
+  compat: string | null;
+  thumb: string | null;
+  lowestSell: number | null;
+  highestBuy: number | null;
+  spread: number | null;
+  roiPct: number | null;
+  scannedAt: string | null;
+}
+
+/** One syndicate's augment list, sorted by current sell price (most plat first). */
+export interface SyndicateSection {
+  syndicate: string;
+  mods: SyndicateAugmentRow[];
+  /** True when none of the mods have a snapshot yet (scan hasn't reached them). */
+  unscanned: boolean;
+}
+
 /** Full detail payload for `/items/[urlName]`. */
 export interface ItemDetail {
   urlName: string;

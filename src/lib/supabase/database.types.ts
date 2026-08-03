@@ -19,6 +19,7 @@ export interface Database {
           url_name: string;
           item_name: string;
           thumb: string | null;
+          tags: string[];
           updated_at: string;
         };
         Insert: {
@@ -26,6 +27,7 @@ export interface Database {
           url_name: string;
           item_name: string;
           thumb?: string | null;
+          tags?: string[];
           updated_at?: string;
         };
         Update: {
@@ -33,6 +35,7 @@ export interface Database {
           url_name?: string;
           item_name?: string;
           thumb?: string | null;
+          tags?: string[];
           updated_at?: string;
         };
         Relationships: [];

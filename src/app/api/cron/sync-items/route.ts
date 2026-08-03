@@ -33,6 +33,7 @@ async function handleSyncItems(request: Request): Promise<NextResponse> {
     url_name: item.url_name,
     item_name: item.item_name,
     thumb: item.thumb,
+    tags: item.tags,
     updated_at: updatedAt,
   }));
 
