@@ -6,18 +6,17 @@ import { RefreshCw } from "lucide-react";
 
 import { scanItemChunk } from "@/lib/dashboard/actions";
 
-/** Items scanned per server call — keeps each action short and progress updates frequent. */
 const CHUNK_SIZE = 10;
 
 /**
- * Scans every mod of one syndicate against warframe.market, in chunks, with a
- * live progress readout. Reloads the page data when finished.
+ * Scans a list of url_names in chunks with live progress.
+ * Shared by syndicates / ducats / relics sync UIs.
  */
-export function SyndicateSyncButton({
-  syndicate,
+export function CatalogSyncButton({
+  label,
   urlNames,
 }: {
-  syndicate: string;
+  label: string;
   urlNames: string[];
 }) {
   const router = useRouter();
@@ -50,11 +49,7 @@ export function SyndicateSyncButton({
 
   if (syncing) {
     return (
-      <div
-        className="flex items-center gap-2"
-        role="status"
-        aria-label={`Syncing ${syndicate}: ${pct}%`}
-      >
+      <div className="flex items-center gap-2" role="status" aria-label={`Syncing ${label}: ${pct}%`}>
         <RefreshCw size={12} className="animate-spin text-teal" />
         <div className="h-1.5 w-24 overflow-hidden rounded border border-line bg-void-raised">
           <div className="h-full bg-teal transition-[width]" style={{ width: `${pct}%` }} />
@@ -79,7 +74,7 @@ export function SyndicateSyncButton({
         className="flex items-center gap-1.5 rounded border border-line px-2.5 py-1 text-xs font-medium text-platinum-dim transition-colors hover:border-teal-dim hover:text-teal disabled:opacity-50"
       >
         <RefreshCw size={12} />
-        Sync all ({urlNames.length})
+        Sync {label} ({urlNames.length})
       </button>
     </div>
   );

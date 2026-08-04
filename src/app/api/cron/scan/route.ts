@@ -37,35 +37,42 @@ function envInt(name: string, fallback: number): number {
 }
 
 /**
- * Selects up to `limit` watchlist url_names that are stale (no snapshot yet,
- * or scanned longer than `WATCHLIST_STALE_MS` ago), most-stale first.
- * Watchlist entries with no matching row in `items` (manifest not synced, or
- * item delisted) are orphans and are skipped — never returned here, so
- * callers never attempt to write a snapshot for a url_name that doesn't
- * exist in `items`.
+ * Selects up to `limit` priority url_names (watchlist + mod_stash) that are
+ * stale (no snapshot yet, or scanned longer than `WATCHLIST_STALE_MS` ago),
+ * most-stale first. Entries with no matching row in `items` are orphans and
+ * skipped — never returned here.
  */
-async function buildWatchlistBatch(
+async function buildPriorityBatch(
   supabase: SupabaseClient<Database>,
   limit: number,
 ): Promise<string[]> {
   if (limit <= 0) return [];
 
-  const { data: pins, error: pinsError } = await supabase
-    .from("watchlist")
-    .select("url_name");
-  if (pinsError) {
-    throw new Error(`Failed to read watchlist: ${pinsError.message}`);
+  const [watchlistResult, stashResult] = await Promise.all([
+    supabase.from("watchlist").select("url_name"),
+    supabase.from("mod_stash").select("url_name"),
+  ]);
+  if (watchlistResult.error) {
+    throw new Error(`Failed to read watchlist: ${watchlistResult.error.message}`);
   }
-  if (!pins || pins.length === 0) return [];
+  if (stashResult.error) {
+    throw new Error(`Failed to read mod_stash: ${stashResult.error.message}`);
+  }
 
-  const pinnedUrlNames = pins.map((pin) => pin.url_name);
+  const pinnedUrlNames = [
+    ...new Set([
+      ...(watchlistResult.data ?? []).map((pin) => pin.url_name),
+      ...(stashResult.data ?? []).map((pin) => pin.url_name),
+    ]),
+  ];
+  if (pinnedUrlNames.length === 0) return [];
 
   const { data: existingItems, error: itemsError } = await supabase
     .from("items")
     .select("url_name")
     .in("url_name", pinnedUrlNames);
   if (itemsError) {
-    throw new Error(`Failed to resolve watchlist items: ${itemsError.message}`);
+    throw new Error(`Failed to resolve priority items: ${itemsError.message}`);
   }
 
   const existingSet = new Set((existingItems ?? []).map((item) => item.url_name));
@@ -77,7 +84,7 @@ async function buildWatchlistBatch(
     .select("url_name, scanned_at")
     .in("url_name", presentUrlNames);
   if (snapshotsError) {
-    throw new Error(`Failed to read watchlist snapshots: ${snapshotsError.message}`);
+    throw new Error(`Failed to read priority snapshots: ${snapshotsError.message}`);
   }
 
   const scannedAtByUrlName = new Map(
@@ -138,7 +145,7 @@ async function runScanBatch(
   }
 
   const watchlistCap = Math.max(0, Math.floor(batchSize * WATCHLIST_BATCH_FRACTION));
-  const watchlistBatch = await buildWatchlistBatch(supabase, watchlistCap);
+  const watchlistBatch = await buildPriorityBatch(supabase, watchlistCap);
   const remaining = Math.max(0, batchSize - watchlistBatch.length);
 
   // Cursor may be stale (catalog shrank since last run) — restart the page from 0.

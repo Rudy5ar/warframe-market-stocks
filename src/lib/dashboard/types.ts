@@ -1,4 +1,5 @@
 import type { AlertType, ScanStatus } from "@/lib/supabase/database.types";
+import type { ModRarity, ModRecommendation } from "@/lib/market";
 
 /** Row for the top-opportunities table (`/` and future ranking views). */
 export interface OpportunityRow {
@@ -10,6 +11,18 @@ export interface OpportunityRow {
   spread: number | null;
   roiPct: number | null;
   volume48h: number | null;
+  scannedAt: string;
+}
+
+/** Row for the snipes board (`/snipes` and home strip). */
+export interface SnipeRow {
+  urlName: string;
+  itemName: string;
+  thumb: string | null;
+  lowestSell: number;
+  median48h: number;
+  discountPct: number;
+  volume48h: number;
   scannedAt: string;
 }
 
@@ -35,6 +48,35 @@ export interface WatchlistRow {
   spread: number | null;
   roiPct: number | null;
   scannedAt: string | null;
+}
+
+/** Row for `/mods` stash (list vs dissolve). */
+export interface ModStashRow {
+  urlName: string;
+  itemName: string | null;
+  thumb: string | null;
+  quantity: number;
+  pinnedAt: string;
+  isOrphan: boolean;
+  lowestSell: number | null;
+  volume48h: number | null;
+  scannedAt: string | null;
+  rarity: ModRarity | null;
+  endo: number | null;
+  recommendation: ModRecommendation;
+}
+
+/** Discovery row: marketable rare/legendary mods not necessarily in the stash. */
+export interface MarketableModRow {
+  urlName: string;
+  itemName: string;
+  thumb: string | null;
+  lowestSell: number | null;
+  volume48h: number | null;
+  scannedAt: string | null;
+  rarity: ModRarity | null;
+  endo: number | null;
+  recommendation: ModRecommendation;
 }
 
 /** Summary for `/status`. */

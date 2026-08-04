@@ -1,6 +1,6 @@
 import "server-only";
 
-import { DEFAULT_SPREAD_THRESHOLDS } from "@/lib/market";
+import { DEFAULT_MIN_SNIPE_VOLUME, DEFAULT_SPREAD_THRESHOLDS, PRICE_DROP_RATIO, priceDropDiscountPct } from "@/lib/market";
 import { createServiceClient } from "@/lib/supabase/server";
 
 import { SYNDICATES, findSyndicateMod } from "./syndicates";
@@ -11,6 +11,7 @@ import type {
   ItemDetail,
   OpportunityRow,
   ScanStatusSummary,
+  SnipeRow,
   SyndicateAugmentRow,
   SyndicateSection,
   WatchlistRow,
@@ -22,10 +23,23 @@ function envFloat(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
+function envInt(name: string, fallback: number): number {
+  const raw = process.env[name];
+  const parsed = raw !== undefined ? Number.parseInt(raw, 10) : NaN;
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
 function opportunityThresholds() {
   return {
     minSpread: envFloat("MIN_SPREAD", DEFAULT_SPREAD_THRESHOLDS.minSpread),
     minRoiPct: envFloat("MIN_ROI_PCT", DEFAULT_SPREAD_THRESHOLDS.minRoiPct),
+  };
+}
+
+function snipeThresholds() {
+  return {
+    priceDropFactor: envFloat("PRICE_DROP_FACTOR", PRICE_DROP_RATIO),
+    minSnipeVolume: envInt("MIN_SNIPE_VOLUME", DEFAULT_MIN_SNIPE_VOLUME),
   };
 }
 
@@ -97,6 +111,62 @@ export async function getTopOpportunities(
     roiPct: row.roi_pct,
     volume48h: row.volume_48h,
     scannedAt: row.scanned_at,
+  }));
+}
+
+/**
+ * Underpriced sells vs 48h median (snipes), ranked by discount %.
+ * Filters in-memory because PostgREST cannot express `lowest_sell < median * factor`.
+ */
+export async function getSnipes(limit = 20): Promise<SnipeRow[]> {
+  const supabase = createServiceClient();
+  const { priceDropFactor, minSnipeVolume } = snipeThresholds();
+
+  const { data, error } = await supabase
+    .from("item_snapshots")
+    .select("url_name, lowest_sell, median_48h, volume_48h, scanned_at")
+    .not("lowest_sell", "is", null)
+    .not("median_48h", "is", null)
+    .gte("volume_48h", minSnipeVolume);
+
+  if (error) {
+    throw new Error(`getSnipes: ${error.message}`);
+  }
+
+  const snipes = (data ?? [])
+    .filter(
+      (row): row is {
+        url_name: string;
+        lowest_sell: number;
+        median_48h: number;
+        volume_48h: number;
+        scanned_at: string;
+      } =>
+        row.lowest_sell !== null &&
+        row.median_48h !== null &&
+        row.volume_48h !== null &&
+        row.lowest_sell < row.median_48h * priceDropFactor,
+    )
+    .map((row) => ({
+      urlName: row.url_name,
+      lowestSell: row.lowest_sell,
+      median48h: row.median_48h,
+      discountPct: priceDropDiscountPct(row.lowest_sell, row.median_48h),
+      volume48h: row.volume_48h,
+      scannedAt: row.scanned_at,
+    }))
+    .sort((a, b) => b.discountPct - a.discountPct || b.volume48h - a.volume48h)
+    .slice(0, limit);
+
+  const itemsByUrlName = await fetchItemNamesByUrlName(
+    supabase,
+    snipes.map((row) => row.urlName),
+  );
+
+  return snipes.map((row) => ({
+    ...row,
+    itemName: itemsByUrlName.get(row.urlName)?.itemName ?? row.urlName,
+    thumb: itemsByUrlName.get(row.urlName)?.thumb ?? null,
   }));
 }
 

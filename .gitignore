@@ -42,3 +42,5 @@ yarn-error.log*
 
 # keep next-env.d.ts tracked
 !next-env.d.ts
+.vercel
+.env*

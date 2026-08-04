@@ -1,0 +1,2294 @@
+[
+  {
+    "urlName": "acceltra_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "acceltra_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "acceltra_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "acceltra_prime_stock",
+    "ducats": 65
+  },
+  {
+    "urlName": "afentis_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "afentis_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "afentis_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "afentis_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "afuris_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "afuris_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "afuris_prime_link",
+    "ducats": 45
+  },
+  {
+    "urlName": "afuris_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "akarius_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "akarius_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "akarius_prime_link",
+    "ducats": 45
+  },
+  {
+    "urlName": "akarius_prime_receiver",
+    "ducats": 65
+  },
+  {
+    "urlName": "akbolto_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "akbolto_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "akbolto_prime_link",
+    "ducats": 45
+  },
+  {
+    "urlName": "akbolto_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "akbronco_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "akbronco_prime_link",
+    "ducats": 45
+  },
+  {
+    "urlName": "akjagara_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "akjagara_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "akjagara_prime_link",
+    "ducats": 45
+  },
+  {
+    "urlName": "akjagara_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "aklex_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "aklex_prime_link",
+    "ducats": 100
+  },
+  {
+    "urlName": "akmagnus_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "akmagnus_prime_link",
+    "ducats": 45
+  },
+  {
+    "urlName": "aksomati_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "aksomati_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "aksomati_prime_link",
+    "ducats": 100
+  },
+  {
+    "urlName": "aksomati_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "akstiletto_prime_barrel",
+    "ducats": 25
+  },
+  {
+    "urlName": "akstiletto_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "akstiletto_prime_link",
+    "ducats": 45
+  },
+  {
+    "urlName": "akstiletto_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "akvasto_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "akvasto_prime_link",
+    "ducats": 45
+  },
+  {
+    "urlName": "alternox_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "alternox_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "alternox_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "alternox_prime_stock",
+    "ducats": 100
+  },
+  {
+    "urlName": "ankyros_prime_blade",
+    "ducats": 65
+  },
+  {
+    "urlName": "ankyros_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "ankyros_prime_gauntlet",
+    "ducats": 15
+  },
+  {
+    "urlName": "ash_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "ash_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "ash_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "ash_prime_systems",
+    "ducats": 65
+  },
+  {
+    "urlName": "astilla_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "astilla_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "astilla_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "astilla_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "athodai_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "athodai_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "athodai_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "atlas_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "atlas_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "atlas_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "atlas_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "ballistica_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "ballistica_prime_lower_limb",
+    "ducats": 15
+  },
+  {
+    "urlName": "ballistica_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "ballistica_prime_string",
+    "ducats": 45
+  },
+  {
+    "urlName": "ballistica_prime_upper_limb",
+    "ducats": 45
+  },
+  {
+    "urlName": "banshee_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "banshee_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "banshee_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "banshee_prime_systems",
+    "ducats": 65
+  },
+  {
+    "urlName": "baruuk_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "baruuk_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "baruuk_prime_neuroptics",
+    "ducats": 65
+  },
+  {
+    "urlName": "baruuk_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "baza_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "baza_prime_blueprint",
+    "ducats": 65
+  },
+  {
+    "urlName": "baza_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "baza_prime_stock",
+    "ducats": 100
+  },
+  {
+    "urlName": "blades",
+    "ducats": 15
+  },
+  {
+    "urlName": "bo_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "bo_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "bo_prime_ornament",
+    "ducats": 15
+  },
+  {
+    "urlName": "boar_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "boar_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "boar_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "boar_prime_stock",
+    "ducats": 100
+  },
+  {
+    "urlName": "boltor_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "boltor_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "boltor_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "boltor_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "braton_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "braton_prime_blueprint",
+    "ducats": 25
+  },
+  {
+    "urlName": "braton_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "braton_prime_stock",
+    "ducats": 25
+  },
+  {
+    "urlName": "bronco_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "bronco_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "bronco_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "burston_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "burston_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "burston_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "burston_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "caliban_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "caliban_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "caliban_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "caliban_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "carapace",
+    "ducats": 100
+  },
+  {
+    "urlName": "carrier_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "carrier_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "cedo_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "cedo_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "cedo_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "cedo_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "cerebrum",
+    "ducats": 100
+  },
+  {
+    "urlName": "cernos_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "cernos_prime_grip",
+    "ducats": 15
+  },
+  {
+    "urlName": "cernos_prime_lower_limb",
+    "ducats": 100
+  },
+  {
+    "urlName": "cernos_prime_string",
+    "ducats": 25
+  },
+  {
+    "urlName": "cernos_prime_upper_limb",
+    "ducats": 15
+  },
+  {
+    "urlName": "chroma_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "chroma_prime_chassis",
+    "ducats": 25
+  },
+  {
+    "urlName": "chroma_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "chroma_prime_systems",
+    "ducats": 65
+  },
+  {
+    "urlName": "cobra_and_crane_prime_blade",
+    "ducats": 45
+  },
+  {
+    "urlName": "cobra_and_crane_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "cobra_and_crane_prime_guard",
+    "ducats": 100
+  },
+  {
+    "urlName": "cobra_and_crane_prime_hilt",
+    "ducats": 15
+  },
+  {
+    "urlName": "corinth_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "corinth_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "corinth_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "corinth_prime_stock",
+    "ducats": 100
+  },
+  {
+    "urlName": "corvas_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "corvas_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "corvas_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "corvas_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "daikyu_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "daikyu_prime_grip",
+    "ducats": 100
+  },
+  {
+    "urlName": "daikyu_prime_lower_limb",
+    "ducats": 45
+  },
+  {
+    "urlName": "daikyu_prime_string",
+    "ducats": 15
+  },
+  {
+    "urlName": "daikyu_prime_upper_limb",
+    "ducats": 45
+  },
+  {
+    "urlName": "dakra_prime_blade",
+    "ducats": 65
+  },
+  {
+    "urlName": "dakra_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "dakra_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "destreza_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "destreza_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "destreza_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "dethcube_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "dethcube_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "disc",
+    "ducats": 45
+  },
+  {
+    "urlName": "dual_kamas_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "dual_kamas_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "dual_kamas_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "dual_keres_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "dual_keres_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "dual_keres_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "dual_zoren_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "dual_zoren_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "dual_zoren_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "ember_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "ember_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "ember_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "ember_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "epitaph_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "epitaph_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "epitaph_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "equinox_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "equinox_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "equinox_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "equinox_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "euphona_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "euphona_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "euphona_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "fang_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "fang_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "fang_prime_handle",
+    "ducats": 25
+  },
+  {
+    "urlName": "fragor_prime_blueprint",
+    "ducats": 65
+  },
+  {
+    "urlName": "fragor_prime_handle",
+    "ducats": 65
+  },
+  {
+    "urlName": "fragor_prime_head",
+    "ducats": 15
+  },
+  {
+    "urlName": "frost_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "frost_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "frost_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "frost_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "fulmin_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "fulmin_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "fulmin_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "fulmin_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "galatine_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "galatine_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "galatine_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "gara_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "gara_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "gara_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "gara_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "garuda_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "garuda_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "garuda_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "garuda_prime_systems",
+    "ducats": 65
+  },
+  {
+    "urlName": "gauss_prime_blueprint",
+    "ducats": 25
+  },
+  {
+    "urlName": "gauss_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "gauss_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "gauss_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "glaive_prime_blade",
+    "ducats": 45
+  },
+  {
+    "urlName": "glaive_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "gram_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "gram_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "gram_prime_handle",
+    "ducats": 100
+  },
+  {
+    "urlName": "grendel_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "grendel_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "grendel_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "grendel_prime_systems",
+    "ducats": 65
+  },
+  {
+    "urlName": "guandao_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "guandao_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "guandao_prime_handle",
+    "ducats": 100
+  },
+  {
+    "urlName": "gunsen_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "gunsen_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "gunsen_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "gyre_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "gyre_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "gyre_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "gyre_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "harness",
+    "ducats": 15
+  },
+  {
+    "urlName": "harrow_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "harrow_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "harrow_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "harrow_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "helios_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "helios_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "hikou_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "hikou_prime_pouch",
+    "ducats": 15
+  },
+  {
+    "urlName": "hikou_prime_stars",
+    "ducats": 15
+  },
+  {
+    "urlName": "hildryn_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "hildryn_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "hildryn_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "hildryn_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "hydroid_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "hydroid_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "hydroid_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "hydroid_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "hystrix_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "hystrix_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "hystrix_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "inaros_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "inaros_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "inaros_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "inaros_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "ivara_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "ivara_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "ivara_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "ivara_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "karyst_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "karyst_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "karyst_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "kavasa_prime_band",
+    "ducats": 45
+  },
+  {
+    "urlName": "kavasa_prime_buckle",
+    "ducats": 65
+  },
+  {
+    "urlName": "kavasa_prime_kubrow_collar_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "kestrel_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "kestrel_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "kestrel_prime_grip",
+    "ducats": 100
+  },
+  {
+    "urlName": "khora_prime_blueprint",
+    "ducats": 65
+  },
+  {
+    "urlName": "khora_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "khora_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "khora_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "knell_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "knell_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "knell_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "kogake_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "kogake_prime_boot",
+    "ducats": 15
+  },
+  {
+    "urlName": "kogake_prime_gauntlet",
+    "ducats": 100
+  },
+  {
+    "urlName": "kompressa_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "kompressa_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "kompressa_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "kompressa_prime_reciever",
+    "ducats": 45
+  },
+  {
+    "urlName": "kronen_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "kronen_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "kronen_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "larkspur_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "larkspur_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "larkspur_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "larkspur_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "latron_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "latron_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "latron_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "latron_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "lavos_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "lavos_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "lavos_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "lavos_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "lex_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "lex_prime_blueprint",
+    "ducats": 25
+  },
+  {
+    "urlName": "lex_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "limbo_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "limbo_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "limbo_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "limbo_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "loki_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "loki_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "loki_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "loki_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "mag_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "mag_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "mag_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "mag_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "magnus_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "magnus_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "magnus_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "masseter_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "masseter_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "masseter_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "mesa_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "mesa_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "mesa_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "mesa_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "mirage_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "mirage_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "mirage_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "mirage_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "nagantaka_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "nagantaka_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "nagantaka_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "nagantaka_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "nami_skyla_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "nami_skyla_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "nami_skyla_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "nautilus_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "nautilus_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "nekros_prime_blueprint",
+    "ducats": 65
+  },
+  {
+    "urlName": "nekros_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "nekros_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "nekros_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "nezha_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "nezha_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "nezha_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "nezha_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "nidus_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "nidus_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "nidus_prime_neuroptics",
+    "ducats": 65
+  },
+  {
+    "urlName": "nidus_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "nikana_prime_blade",
+    "ducats": 65
+  },
+  {
+    "urlName": "nikana_prime_blueprint",
+    "ducats": 25
+  },
+  {
+    "urlName": "nikana_prime_hilt",
+    "ducats": 100
+  },
+  {
+    "urlName": "ninkondi_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "ninkondi_prime_chain",
+    "ducats": 45
+  },
+  {
+    "urlName": "ninkondi_prime_handle",
+    "ducats": 100
+  },
+  {
+    "urlName": "nova_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "nova_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "nova_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "nova_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "nyx_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "nyx_prime_chassis",
+    "ducats": 65
+  },
+  {
+    "urlName": "nyx_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "nyx_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "oberon_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "oberon_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "oberon_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "oberon_prime_systems",
+    "ducats": 65
+  },
+  {
+    "urlName": "octavia_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "octavia_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "octavia_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "octavia_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "odonata_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "odonata_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "okina_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "okina_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "okina_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "orthos_prime_blade",
+    "ducats": 45
+  },
+  {
+    "urlName": "orthos_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "orthos_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "pandero_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "pandero_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "pandero_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "pangolin_prime_blade",
+    "ducats": 45
+  },
+  {
+    "urlName": "pangolin_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "pangolin_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "panthera_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "panthera_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "panthera_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "panthera_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "paris_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "paris_prime_grip",
+    "ducats": 45
+  },
+  {
+    "urlName": "paris_prime_lower_limb",
+    "ducats": 15
+  },
+  {
+    "urlName": "paris_prime_string",
+    "ducats": 15
+  },
+  {
+    "urlName": "paris_prime_upper_limb",
+    "ducats": 25
+  },
+  {
+    "urlName": "perigale_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "perigale_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "perigale_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "perigale_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "phantasma_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "phantasma_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "phantasma_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "phantasma_prime_stock",
+    "ducats": 65
+  },
+  {
+    "urlName": "protea_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "protea_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "protea_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "protea_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "pyrana_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "pyrana_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "pyrana_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "quassus_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "quassus_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "quassus_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "reaper_prime_blade",
+    "ducats": 45
+  },
+  {
+    "urlName": "reaper_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "reaper_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "redeemer_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "redeemer_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "redeemer_prime_handle",
+    "ducats": 100
+  },
+  {
+    "urlName": "revenant_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "revenant_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "revenant_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "revenant_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "rhino_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "rhino_prime_chassis",
+    "ducats": 65
+  },
+  {
+    "urlName": "rhino_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "rhino_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "rubico_prime_barrel",
+    "ducats": 25
+  },
+  {
+    "urlName": "rubico_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "rubico_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "rubico_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "sarofang_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "sarofang_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "sarofang_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "saryn_prime_blueprint",
+    "ducats": 65
+  },
+  {
+    "urlName": "saryn_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "saryn_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "saryn_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "scindo_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "scindo_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "scindo_prime_handle",
+    "ducats": 25
+  },
+  {
+    "urlName": "scourge_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "scourge_prime_blade",
+    "ducats": 15
+  },
+  {
+    "urlName": "scourge_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "scourge_prime_handle",
+    "ducats": 45
+  },
+  {
+    "urlName": "sevagoth_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "sevagoth_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "sevagoth_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "sevagoth_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "shade_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "shade_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "sicarus_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "sicarus_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "sicarus_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "silva_and_aegis_prime_blade",
+    "ducats": 45
+  },
+  {
+    "urlName": "silva_and_aegis_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "silva_and_aegis_prime_guard",
+    "ducats": 100
+  },
+  {
+    "urlName": "silva_and_aegis_prime_hilt",
+    "ducats": 15
+  },
+  {
+    "urlName": "soma_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "soma_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "soma_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "soma_prime_stock",
+    "ducats": 100
+  },
+  {
+    "urlName": "spira_prime_blade",
+    "ducats": 65
+  },
+  {
+    "urlName": "spira_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "spira_prime_pouch",
+    "ducats": 100
+  },
+  {
+    "urlName": "stradavar_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "stradavar_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "stradavar_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "stradavar_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "strun_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "strun_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "strun_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "strun_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "styanax_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "styanax_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "styanax_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "styanax_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "sybaris_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "sybaris_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "sybaris_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "sybaris_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "tatsu_prime_blade",
+    "ducats": 45
+  },
+  {
+    "urlName": "tatsu_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "tatsu_prime_handle",
+    "ducats": 100
+  },
+  {
+    "urlName": "tekko_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "tekko_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "tekko_prime_gauntlet",
+    "ducats": 15
+  },
+  {
+    "urlName": "tenora_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "tenora_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "tenora_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "tenora_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "tiberon_prime_barrel",
+    "ducats": 65
+  },
+  {
+    "urlName": "tiberon_prime_blueprint",
+    "ducats": 25
+  },
+  {
+    "urlName": "tiberon_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "tiberon_prime_stock",
+    "ducats": 100
+  },
+  {
+    "urlName": "tigris_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "tigris_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "tigris_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "tigris_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "tipedo_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "tipedo_prime_handle",
+    "ducats": 100
+  },
+  {
+    "urlName": "tipedo_prime_ornament",
+    "ducats": 45
+  },
+  {
+    "urlName": "titania_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "titania_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "titania_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "titania_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "trinity_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "trinity_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "trinity_prime_neuroptics",
+    "ducats": 25
+  },
+  {
+    "urlName": "trinity_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "trumna_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "trumna_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "trumna_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "trumna_prime_stock",
+    "ducats": 45
+  },
+  {
+    "urlName": "vadarya_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "vadarya_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "vadarya_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "vadarya_prime_stock",
+    "ducats": 15
+  },
+  {
+    "urlName": "valkyr_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "valkyr_prime_chassis",
+    "ducats": 100
+  },
+  {
+    "urlName": "valkyr_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "valkyr_prime_systems",
+    "ducats": 65
+  },
+  {
+    "urlName": "vasto_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "vasto_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "vasto_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "vauban_prime_blueprint",
+    "ducats": 65
+  },
+  {
+    "urlName": "vauban_prime_chassis",
+    "ducats": 25
+  },
+  {
+    "urlName": "vauban_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "vauban_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "vectis_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "vectis_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "vectis_prime_receiver",
+    "ducats": 100
+  },
+  {
+    "urlName": "vectis_prime_stock",
+    "ducats": 65
+  },
+  {
+    "urlName": "velox_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "velox_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "velox_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "venato_prime_blade",
+    "ducats": 100
+  },
+  {
+    "urlName": "venato_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "venato_prime_handle",
+    "ducats": 15
+  },
+  {
+    "urlName": "venka_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "venka_prime_gauntlet",
+    "ducats": 100
+  },
+  {
+    "urlName": "volnus_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "volnus_prime_handle",
+    "ducats": 100
+  },
+  {
+    "urlName": "volnus_prime_head",
+    "ducats": 45
+  },
+  {
+    "urlName": "volt_prime_blueprint",
+    "ducats": 25
+  },
+  {
+    "urlName": "volt_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "volt_prime_neuroptics",
+    "ducats": 65
+  },
+  {
+    "urlName": "volt_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "voruna_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "voruna_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "voruna_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "voruna_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "wings",
+    "ducats": 65
+  },
+  {
+    "urlName": "wisp_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "wisp_prime_chassis",
+    "ducats": 65
+  },
+  {
+    "urlName": "wisp_prime_neuroptics",
+    "ducats": 45
+  },
+  {
+    "urlName": "wisp_prime_systems",
+    "ducats": 15
+  },
+  {
+    "urlName": "wukong_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "wukong_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "wukong_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "wukong_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "wyrm_prime_blueprint",
+    "ducats": 15
+  },
+  {
+    "urlName": "wyrm_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "xaku_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "xaku_prime_chassis",
+    "ducats": 45
+  },
+  {
+    "urlName": "xaku_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "xaku_prime_systems",
+    "ducats": 45
+  },
+  {
+    "urlName": "yareli_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "yareli_prime_chassis",
+    "ducats": 15
+  },
+  {
+    "urlName": "yareli_prime_neuroptics",
+    "ducats": 100
+  },
+  {
+    "urlName": "yareli_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "zakti_prime_barrel",
+    "ducats": 45
+  },
+  {
+    "urlName": "zakti_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "zakti_prime_receiver",
+    "ducats": 15
+  },
+  {
+    "urlName": "zephyr_prime_blueprint",
+    "ducats": 65
+  },
+  {
+    "urlName": "zephyr_prime_chassis",
+    "ducats": 25
+  },
+  {
+    "urlName": "zephyr_prime_neuroptics",
+    "ducats": 15
+  },
+  {
+    "urlName": "zephyr_prime_systems",
+    "ducats": 100
+  },
+  {
+    "urlName": "zhuge_prime_barrel",
+    "ducats": 100
+  },
+  {
+    "urlName": "zhuge_prime_blueprint",
+    "ducats": 45
+  },
+  {
+    "urlName": "zhuge_prime_grip",
+    "ducats": 15
+  },
+  {
+    "urlName": "zhuge_prime_receiver",
+    "ducats": 45
+  },
+  {
+    "urlName": "zhuge_prime_string",
+    "ducats": 15
+  },
+  {
+    "urlName": "zylok_prime_barrel",
+    "ducats": 15
+  },
+  {
+    "urlName": "zylok_prime_blueprint",
+    "ducats": 100
+  },
+  {
+    "urlName": "zylok_prime_receiver",
+    "ducats": 45
+  }
+]

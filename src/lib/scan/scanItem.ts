@@ -3,9 +3,11 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
+  DEFAULT_MIN_SNIPE_VOLUME,
   PRICE_DROP_RATIO,
   computeMedian48h,
   computeSpreadMetrics,
+  isPriceDrop,
   isSpreadOpportunity,
 } from "@/lib/market";
 import type { SpreadMetrics } from "@/lib/market";
@@ -15,6 +17,12 @@ import { getItemOrders, getItemStatistics } from "@/lib/wfm";
 function envFloat(name: string, fallback: number): number {
   const raw = process.env[name];
   const parsed = raw !== undefined ? Number.parseFloat(raw) : NaN;
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function envInt(name: string, fallback: number): number {
+  const raw = process.env[name];
+  const parsed = raw !== undefined ? Number.parseInt(raw, 10) : NaN;
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
@@ -28,6 +36,7 @@ export interface ScanThresholds {
   minSpread: number;
   minRoiPct: number;
   priceDropFactor: number;
+  minSnipeVolume: number;
   fetchStats: boolean;
 }
 
@@ -36,6 +45,7 @@ export function readThresholds(): ScanThresholds {
     minSpread: envFloat("MIN_SPREAD", 5),
     minRoiPct: envFloat("MIN_ROI_PCT", 15),
     priceDropFactor: envFloat("PRICE_DROP_FACTOR", PRICE_DROP_RATIO),
+    minSnipeVolume: envInt("MIN_SNIPE_VOLUME", DEFAULT_MIN_SNIPE_VOLUME),
     // MVP simplicity: batches are small (~20 items), so fetching statistics
     // for every item in the batch is cheap enough to just always do it.
     fetchStats: envBool("SCAN_STATS_EVERY_BATCH", true),
@@ -101,10 +111,11 @@ export async function scanOneItem(
     volume48h ?? undefined,
   );
 
-  const priceDropAlert =
-    metrics.lowestSell !== null &&
-    median48h !== null &&
-    metrics.lowestSell < median48h * thresholds.priceDropFactor;
+  const priceDropAlert = isPriceDrop(metrics.lowestSell, median48h, {
+    factor: thresholds.priceDropFactor,
+    minVolume: thresholds.minSnipeVolume,
+    volume: volume48h,
+  });
 
   if (spreadAlert) {
     const { error } = await supabase.from("alerts").upsert(

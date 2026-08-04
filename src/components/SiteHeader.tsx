@@ -1,8 +1,12 @@
 import Link from "next/link";
 
 const NAV_LINKS = [
-  { href: "/", label: "Opportunities" },
+  { href: "/", label: "Home" },
+  { href: "/snipes", label: "Snipes" },
   { href: "/syndicates", label: "Syndicates" },
+  { href: "/mods", label: "Mods" },
+  { href: "/ducats", label: "Ducats" },
+  { href: "/relics", label: "Relics" },
   { href: "/alerts", label: "Alerts" },
   { href: "/watchlist", label: "Watchlist" },
   { href: "/status", label: "Status" },

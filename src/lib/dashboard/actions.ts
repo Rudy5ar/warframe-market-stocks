@@ -18,6 +18,12 @@ function normalizeUrlName(raw: FormDataEntryValue | null): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
+function parseQuantity(raw: FormDataEntryValue | null): number {
+  if (typeof raw !== "string" || raw.trim() === "") return 1;
+  const parsed = Number.parseInt(raw, 10);
+  return Number.isFinite(parsed) && parsed >= 1 ? parsed : 1;
+}
+
 /** Pins an item so the scan cron prioritizes it. Safe to call for an already-pinned url_name. */
 export async function addWatchlistItem(formData: FormData): Promise<void> {
   const urlName = normalizeUrlName(formData.get("urlName"));
@@ -43,11 +49,10 @@ export interface ScanChunkResult {
 }
 
 /**
- * Scans one chunk of a syndicate's mods (orders + statistics each) on demand.
- * The `/syndicates` client drives the full list in small sequential chunks so
- * it can show live progress; per-item failures are tolerated and reported.
+ * Scans one chunk of url_names (orders + statistics each) on demand.
+ * Used by syndicate / ducat / relic sync buttons in small sequential chunks.
  */
-export async function scanSyndicateMods(urlNames: string[]): Promise<ScanChunkResult> {
+export async function scanItemChunk(urlNames: string[]): Promise<ScanChunkResult> {
   const valid = (Array.isArray(urlNames) ? urlNames : [])
     .filter((urlName) => typeof urlName === "string" && URL_NAME_PATTERN.test(urlName))
     .slice(0, SCAN_CHUNK_MAX);
@@ -67,6 +72,11 @@ export async function scanSyndicateMods(urlNames: string[]): Promise<ScanChunkRe
   return { scanned: valid.length - failed.length, failed };
 }
 
+/** Alias for syndicate UI — same as scanItemChunk. */
+export async function scanSyndicateMods(urlNames: string[]): Promise<ScanChunkResult> {
+  return scanItemChunk(urlNames);
+}
+
 /** Unpins an item. */
 export async function removeWatchlistItem(formData: FormData): Promise<void> {
   const urlName = normalizeUrlName(formData.get("urlName"));
@@ -82,4 +92,79 @@ export async function removeWatchlistItem(formData: FormData): Promise<void> {
   revalidatePath("/watchlist");
   revalidatePath("/");
   revalidatePath(`/items/${urlName}`);
+}
+
+/** Add or bump quantity for a mod in the don't-dissolve stash. */
+export async function addModStashItem(formData: FormData): Promise<void> {
+  const urlName = normalizeUrlName(formData.get("urlName"));
+  if (!urlName) return;
+  const quantity = parseQuantity(formData.get("quantity"));
+
+  const supabase = createServiceClient();
+  const { data: existing } = await supabase
+    .from("mod_stash")
+    .select("quantity")
+    .eq("url_name", urlName)
+    .maybeSingle();
+
+  const nextQty = (existing?.quantity ?? 0) + quantity;
+  const { error } = await supabase.from("mod_stash").upsert(
+    { url_name: urlName, quantity: nextQty },
+    { onConflict: "url_name" },
+  );
+
+  if (error) {
+    throw new Error(`addModStashItem: ${error.message}`);
+  }
+
+  revalidatePath("/mods");
+}
+
+/** Bulk-add url_names (one per line or comma-separated). Each starts at qty 1 if new. */
+export async function bulkAddModStash(formData: FormData): Promise<void> {
+  const raw = formData.get("bulk");
+  if (typeof raw !== "string" || !raw.trim()) return;
+
+  const names = raw
+    .split(/[\n,]+/)
+    .map((part) => part.trim().toLowerCase().replace(/\s+/g, "_"))
+    .filter((name) => URL_NAME_PATTERN.test(name));
+
+  if (names.length === 0) return;
+
+  const supabase = createServiceClient();
+  const unique = [...new Set(names)].slice(0, 100);
+
+  const { data: existing } = await supabase
+    .from("mod_stash")
+    .select("url_name, quantity")
+    .in("url_name", unique);
+
+  const qtyByUrl = new Map((existing ?? []).map((row) => [row.url_name, row.quantity]));
+
+  const rows = unique.map((urlName) => ({
+    url_name: urlName,
+    quantity: (qtyByUrl.get(urlName) ?? 0) + 1,
+  }));
+
+  const { error } = await supabase.from("mod_stash").upsert(rows, { onConflict: "url_name" });
+  if (error) {
+    throw new Error(`bulkAddModStash: ${error.message}`);
+  }
+
+  revalidatePath("/mods");
+}
+
+export async function removeModStashItem(formData: FormData): Promise<void> {
+  const urlName = normalizeUrlName(formData.get("urlName"));
+  if (!urlName) return;
+
+  const supabase = createServiceClient();
+  const { error } = await supabase.from("mod_stash").delete().eq("url_name", urlName);
+
+  if (error) {
+    throw new Error(`removeModStashItem: ${error.message}`);
+  }
+
+  revalidatePath("/mods");
 }
