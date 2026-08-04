@@ -1,4 +1,5 @@
 import type { AlertType, ScanStatus } from "@/lib/supabase/database.types";
+import type { ModRarity, ModRecommendation } from "@/lib/market";
 
 export interface OpportunityRow {
   urlName: string;
@@ -9,6 +10,17 @@ export interface OpportunityRow {
   spread: number | null;
   roiPct: number | null;
   volume48h: number | null;
+  scannedAt: string;
+}
+
+export interface SnipeRow {
+  urlName: string;
+  itemName: string;
+  thumb: string | null;
+  lowestSell: number;
+  median48h: number;
+  discountPct: number;
+  volume48h: number;
   scannedAt: string;
 }
 
@@ -32,6 +44,33 @@ export interface WatchlistRow {
   spread: number | null;
   roiPct: number | null;
   scannedAt: string | null;
+}
+
+export interface ModStashRow {
+  urlName: string;
+  itemName: string | null;
+  thumb: string | null;
+  quantity: number;
+  pinnedAt: string;
+  isOrphan: boolean;
+  lowestSell: number | null;
+  volume48h: number | null;
+  scannedAt: string | null;
+  rarity: ModRarity | null;
+  endo: number | null;
+  recommendation: ModRecommendation;
+}
+
+export interface MarketableModRow {
+  urlName: string;
+  itemName: string;
+  thumb: string | null;
+  lowestSell: number | null;
+  volume48h: number | null;
+  scannedAt: string | null;
+  rarity: ModRarity | null;
+  endo: number | null;
+  recommendation: ModRecommendation;
 }
 
 export interface ScanStatusSummary {

@@ -202,6 +202,24 @@ export interface Database {
         };
         Relationships: [];
       };
+      mod_stash: {
+        Row: {
+          url_name: string;
+          quantity: number;
+          created_at: string;
+        };
+        Insert: {
+          url_name: string;
+          quantity?: number;
+          created_at?: string;
+        };
+        Update: {
+          url_name?: string;
+          quantity?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;

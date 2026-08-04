@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 
-import { scanSyndicateMods } from "@/lib/dashboard/actions";
+import { scanItemChunk } from "@/lib/dashboard/actions";
 
 const CHUNK_SIZE = 10;
 
@@ -30,7 +30,7 @@ export function SyndicateSyncButton({
     for (let i = 0; i < urlNames.length; i += CHUNK_SIZE) {
       const chunk = urlNames.slice(i, i + CHUNK_SIZE);
       try {
-        const result = await scanSyndicateMods(chunk);
+        const result = await scanItemChunk(chunk);
         failures += result.failed.length;
       } catch {
         failures += chunk.length;
