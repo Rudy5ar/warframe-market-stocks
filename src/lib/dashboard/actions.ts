@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
+import { searchCatalog } from "@/lib/dashboard/queries";
 import { readThresholds, scanOneItem } from "@/lib/scan/scanItem";
 import { createServiceClient } from "@/lib/supabase/server";
 
@@ -118,6 +119,7 @@ export async function addModStashItem(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/mods");
+  revalidatePath("/");
 }
 
 /** Bulk-add url_names (one per line or comma-separated). Each starts at qty 1 if new. */
@@ -153,6 +155,7 @@ export async function bulkAddModStash(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/mods");
+  revalidatePath("/");
 }
 
 export async function removeModStashItem(formData: FormData): Promise<void> {
@@ -167,4 +170,9 @@ export async function removeModStashItem(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/mods");
+  revalidatePath("/");
+}
+
+export async function searchCatalogAction(query: string) {
+  return searchCatalog(query);
 }

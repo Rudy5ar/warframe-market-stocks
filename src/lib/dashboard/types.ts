@@ -1,6 +1,13 @@
 import type { AlertType, ScanStatus } from "@/lib/supabase/database.types";
 import type { ModRarity, ModRecommendation } from "@/lib/market";
 
+/** Catalog search hit for header / pin forms. */
+export interface CatalogHit {
+  urlName: string;
+  itemName: string;
+  thumb: string | null;
+}
+
 /** Row for the top-opportunities table (`/` and future ranking views). */
 export interface OpportunityRow {
   urlName: string;
@@ -14,24 +21,13 @@ export interface OpportunityRow {
   scannedAt: string;
 }
 
-/** Row for the snipes board (`/snipes` and home strip). */
-export interface SnipeRow {
-  urlName: string;
-  itemName: string;
-  thumb: string | null;
-  lowestSell: number;
-  median48h: number;
-  discountPct: number;
-  volume48h: number;
-  scannedAt: string;
-}
-
 /** Row for the alerts feed (`/` strip and `/alerts`). */
 export interface AlertRow {
   id: number;
   type: AlertType;
   urlName: string;
   itemName: string;
+  thumb: string | null;
   payload: Record<string, number | null>;
   alertDay: string;
   createdAt: string;
@@ -138,4 +134,29 @@ export interface ItemDetail {
   scannedAt: string | null;
   history: HistoryPoint[];
   alerts: AlertRow[];
+}
+
+export type DucatSort = "plat_per_ducat" | "sell";
+
+export interface DucatBoardRow {
+  urlName: string;
+  itemName: string;
+  thumb: string | null;
+  ducats: number;
+  lowestSell: number | null;
+  volume48h: number | null;
+  scannedAt: string | null;
+  platPerDucat: number | null;
+  recommendation: "sell" | "junk" | "unknown";
+}
+
+export interface RelicBoardRow {
+  name: string;
+  era: string;
+  code: string;
+  vaulted: boolean;
+  intactEv: number | null;
+  radiantEv: number | null;
+  pricedDrops: number;
+  totalDrops: number;
 }

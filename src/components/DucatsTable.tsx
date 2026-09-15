@@ -3,12 +3,13 @@
 import { EmptyState } from "@/components/ui/EmptyState";
 import { FilterInput, useTextFilter } from "@/components/ui/FilterInput";
 import { ItemNameLink } from "@/components/ui/ItemNameLink";
+import { RecBadge } from "@/components/ui/RecBadge";
 import { TableShell, Th, Tr } from "@/components/ui/TableShell";
 import { WfmLink } from "@/components/ui/WfmLink";
-import type { OpportunityRow } from "@/lib/dashboard/types";
-import { formatDateTime, formatPercent, formatPlatinum, formatVolume } from "@/lib/format";
+import type { DucatBoardRow } from "@/lib/dashboard/types";
+import { formatDateTime, formatPlatinum, formatVolume } from "@/lib/format";
 
-export function OpportunitiesTable({ rows }: { rows: OpportunityRow[] }) {
+export function DucatsTable({ rows }: { rows: DucatBoardRow[] }) {
   const { query, setQuery, filtered } = useTextFilter(
     rows,
     (row) => `${row.itemName} ${row.urlName}`,
@@ -17,25 +18,25 @@ export function OpportunitiesTable({ rows }: { rows: OpportunityRow[] }) {
   if (rows.length === 0) {
     return (
       <EmptyState>
-        No flips clear the spread and ROI bar yet. Wait for the next scan.
+        No ducat parts loaded. Prices show after a scan — use Sync prices if rows are empty.
       </EmptyState>
     );
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <FilterInput value={query} onChange={setQuery} placeholder="Filter flips…" />
+      <FilterInput value={query} onChange={setQuery} placeholder="Filter parts…" />
       {filtered.length === 0 ? (
-        <EmptyState>No flips match that filter.</EmptyState>
+        <EmptyState>No parts match that filter.</EmptyState>
       ) : (
         <TableShell>
           <thead>
             <tr>
-              <Th>Item</Th>
+              <Th>Part</Th>
               <Th>Sell</Th>
-              <Th>Buy</Th>
-              <Th>Spread</Th>
-              <Th>ROI</Th>
+              <Th>Ducats</Th>
+              <Th>Plat/ducat</Th>
+              <Th>Do</Th>
               <Th>Vol 48h</Th>
               <Th>Scanned</Th>
               <Th />
@@ -47,17 +48,15 @@ export function OpportunitiesTable({ rows }: { rows: OpportunityRow[] }) {
                 <td className="px-3 py-2">
                   <ItemNameLink urlName={row.urlName} name={row.itemName} thumb={row.thumb} />
                 </td>
-                <td className="font-mono-num px-3 py-2 text-platinum-dim">
+                <td className="font-mono-num px-3 py-2 font-medium text-platinum">
                   {formatPlatinum(row.lowestSell)}
                 </td>
-                <td className="font-mono-num px-3 py-2 text-platinum-dim">
-                  {formatPlatinum(row.highestBuy)}
+                <td className="font-mono-num px-3 py-2 text-platinum-dim">{row.ducats}</td>
+                <td className="font-mono-num px-3 py-2 text-teal">
+                  {row.platPerDucat !== null ? row.platPerDucat.toFixed(2) : "—"}
                 </td>
-                <td className="font-mono-num px-3 py-2 text-platinum">
-                  {formatPlatinum(row.spread)}
-                </td>
-                <td className="font-mono-num px-3 py-2 font-medium text-teal">
-                  {formatPercent(row.roiPct)}
+                <td className="px-3 py-2">
+                  <RecBadge recommendation={row.recommendation} />
                 </td>
                 <td className="font-mono-num px-3 py-2 text-platinum-dim">
                   {formatVolume(row.volume48h)}

@@ -1,17 +1,17 @@
 import "server-only";
 
-import { DEFAULT_MIN_SNIPE_VOLUME, DEFAULT_SPREAD_THRESHOLDS, PRICE_DROP_RATIO, priceDropDiscountPct } from "@/lib/market";
+import { DEFAULT_SPREAD_THRESHOLDS } from "@/lib/market";
 import { createServiceClient } from "@/lib/supabase/server";
 
 import { SYNDICATES, findSyndicateMod } from "./syndicates";
 import type { SyndicateModEntry } from "./syndicates";
 import type {
   AlertRow,
+  CatalogHit,
   HistoryPoint,
   ItemDetail,
   OpportunityRow,
   ScanStatusSummary,
-  SnipeRow,
   SyndicateAugmentRow,
   SyndicateSection,
   WatchlistRow,
@@ -23,23 +23,10 @@ function envFloat(name: string, fallback: number): number {
   return Number.isFinite(parsed) ? parsed : fallback;
 }
 
-function envInt(name: string, fallback: number): number {
-  const raw = process.env[name];
-  const parsed = raw !== undefined ? Number.parseInt(raw, 10) : NaN;
-  return Number.isFinite(parsed) ? parsed : fallback;
-}
-
 function opportunityThresholds() {
   return {
     minSpread: envFloat("MIN_SPREAD", DEFAULT_SPREAD_THRESHOLDS.minSpread),
     minRoiPct: envFloat("MIN_ROI_PCT", DEFAULT_SPREAD_THRESHOLDS.minRoiPct),
-  };
-}
-
-function snipeThresholds() {
-  return {
-    priceDropFactor: envFloat("PRICE_DROP_FACTOR", PRICE_DROP_RATIO),
-    minSnipeVolume: envInt("MIN_SNIPE_VOLUME", DEFAULT_MIN_SNIPE_VOLUME),
   };
 }
 
@@ -114,62 +101,6 @@ export async function getTopOpportunities(
   }));
 }
 
-/**
- * Underpriced sells vs 48h median (snipes), ranked by discount %.
- * Filters in-memory because PostgREST cannot express `lowest_sell < median * factor`.
- */
-export async function getSnipes(limit = 20): Promise<SnipeRow[]> {
-  const supabase = createServiceClient();
-  const { priceDropFactor, minSnipeVolume } = snipeThresholds();
-
-  const { data, error } = await supabase
-    .from("item_snapshots")
-    .select("url_name, lowest_sell, median_48h, volume_48h, scanned_at")
-    .not("lowest_sell", "is", null)
-    .not("median_48h", "is", null)
-    .gte("volume_48h", minSnipeVolume);
-
-  if (error) {
-    throw new Error(`getSnipes: ${error.message}`);
-  }
-
-  const snipes = (data ?? [])
-    .filter(
-      (row): row is {
-        url_name: string;
-        lowest_sell: number;
-        median_48h: number;
-        volume_48h: number;
-        scanned_at: string;
-      } =>
-        row.lowest_sell !== null &&
-        row.median_48h !== null &&
-        row.volume_48h !== null &&
-        row.lowest_sell < row.median_48h * priceDropFactor,
-    )
-    .map((row) => ({
-      urlName: row.url_name,
-      lowestSell: row.lowest_sell,
-      median48h: row.median_48h,
-      discountPct: priceDropDiscountPct(row.lowest_sell, row.median_48h),
-      volume48h: row.volume_48h,
-      scannedAt: row.scanned_at,
-    }))
-    .sort((a, b) => b.discountPct - a.discountPct || b.volume48h - a.volume48h)
-    .slice(0, limit);
-
-  const itemsByUrlName = await fetchItemNamesByUrlName(
-    supabase,
-    snipes.map((row) => row.urlName),
-  );
-
-  return snipes.map((row) => ({
-    ...row,
-    itemName: itemsByUrlName.get(row.urlName)?.itemName ?? row.urlName,
-    thumb: itemsByUrlName.get(row.urlName)?.thumb ?? null,
-  }));
-}
-
 /** Most recent spread/price-drop alerts, newest first. */
 export async function getRecentAlerts(limit = 20): Promise<AlertRow[]> {
   const supabase = createServiceClient();
@@ -195,6 +126,7 @@ export async function getRecentAlerts(limit = 20): Promise<AlertRow[]> {
     type: row.type,
     urlName: row.url_name,
     itemName: itemsByUrlName.get(row.url_name)?.itemName ?? row.url_name,
+    thumb: itemsByUrlName.get(row.url_name)?.thumb ?? null,
     payload: (row.payload ?? {}) as Record<string, number | null>,
     alertDay: row.alert_day,
     createdAt: row.created_at,
@@ -447,6 +379,7 @@ export async function getItemDetail(urlName: string): Promise<ItemDetail | null>
     type: row.type,
     urlName: row.url_name,
     itemName,
+    thumb: item?.thumb ?? null,
     payload: (row.payload ?? {}) as Record<string, number | null>,
     alertDay: row.alert_day,
     createdAt: row.created_at,
@@ -468,4 +401,54 @@ export async function getItemDetail(urlName: string): Promise<ItemDetail | null>
     history,
     alerts,
   };
+}
+
+/** Header pulse: cursor only, so a missing row does not 500 the whole app. */
+export async function getScanPulse(): Promise<{
+  status: ScanStatusSummary["status"];
+  lastRunAt: string | null;
+}> {
+  const supabase = createServiceClient();
+  const { data: cursor, error } = await supabase
+    .from("scan_cursor")
+    .select("status, last_run_at")
+    .eq("id", 1)
+    .maybeSingle();
+
+  if (error || !cursor) {
+    return { status: "idle", lastRunAt: null };
+  }
+
+  return { status: cursor.status, lastRunAt: cursor.last_run_at };
+}
+
+export function sanitizeCatalogQuery(raw: string): string {
+  return raw.replace(/[^a-zA-Z0-9 _-]/g, "").trim().slice(0, 80);
+}
+
+/** Catalog name / url_name search for the header and pin forms. */
+export async function searchCatalog(query: string, limit = 8): Promise<CatalogHit[]> {
+  const safe = sanitizeCatalogQuery(query);
+  if (safe.length < 2) return [];
+
+  const supabase = createServiceClient();
+  const fuzzy = `%${safe.replace(/\s+/g, "%")}%`;
+  const slug = `%${safe.toLowerCase().replace(/\s+/g, "_")}%`;
+
+  const { data, error } = await supabase
+    .from("items")
+    .select("url_name, item_name, thumb")
+    .or(`item_name.ilike."${fuzzy}",url_name.ilike."${slug}"`)
+    .order("item_name", { ascending: true })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(`searchCatalog: ${error.message}`);
+  }
+
+  return (data ?? []).map((row) => ({
+    urlName: row.url_name,
+    itemName: row.item_name,
+    thumb: row.thumb,
+  }));
 }

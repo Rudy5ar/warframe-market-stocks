@@ -1,72 +1,71 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { ExternalLink, EyeOff } from "lucide-react";
+import { EyeOff } from "lucide-react";
 
 import { SyndicateSyncButton } from "@/components/SyndicateSyncButton";
-import type { SyndicateSection } from "@/lib/dashboard";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { FilterInput, useTextFilter } from "@/components/ui/FilterInput";
+import { ItemNameLink } from "@/components/ui/ItemNameLink";
+import { TableShell, Th, Tr } from "@/components/ui/TableShell";
+import { WfmLink } from "@/components/ui/WfmLink";
+import type { SyndicateSection } from "@/lib/dashboard/types";
 import { SYNDICATES, syndicateSlug } from "@/lib/dashboard/syndicates";
-import { formatDateTime, formatPercent, formatPlatinum, wfmItemUrl } from "@/lib/format";
+import { formatDateTime, formatPercent, formatPlatinum } from "@/lib/format";
 
 function SyndicateTable({ section }: { section: SyndicateSection }) {
+  const { query, setQuery, filtered } = useTextFilter(
+    section.mods,
+    (mod) => `${mod.itemName} ${mod.urlName} ${mod.compat ?? ""}`,
+  );
+
   return (
-    <div className="scroll-thin overflow-x-auto rounded border border-line">
-      <table className="w-full min-w-[640px] border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-platinum-faint">
-            <th className="px-3 py-2 font-medium">Mod</th>
-            <th className="px-3 py-2 font-medium">For</th>
-            <th className="px-3 py-2 font-medium">Sell</th>
-            <th className="px-3 py-2 font-medium">Buy</th>
-            <th className="px-3 py-2 font-medium">Spread</th>
-            <th className="px-3 py-2 font-medium">ROI</th>
-            <th className="px-3 py-2 font-medium">Scanned</th>
-            <th className="px-3 py-2 font-medium" />
-          </tr>
-        </thead>
-        <tbody>
-          {section.mods.map((mod) => (
-            <tr
-              key={mod.urlName}
-              className="border-b border-line last:border-b-0 transition-colors hover:bg-void-raised"
-            >
-              <td className="px-3 py-2">
-                <Link href={`/items/${mod.urlName}`} className="text-platinum hover:text-teal">
-                  {mod.itemName}
-                </Link>
-              </td>
-              <td className="px-3 py-2 text-xs text-platinum-faint">{mod.compat ?? "—"}</td>
-              <td className="font-mono-num px-3 py-2 font-medium text-platinum">
-                {formatPlatinum(mod.lowestSell)}
-              </td>
-              <td className="font-mono-num px-3 py-2 text-platinum-dim">
-                {formatPlatinum(mod.highestBuy)}
-              </td>
-              <td className="font-mono-num px-3 py-2 text-platinum-dim">
-                {formatPlatinum(mod.spread)}
-              </td>
-              <td className="font-mono-num px-3 py-2 text-teal">
-                {formatPercent(mod.roiPct)}
-              </td>
-              <td className="font-mono-num px-3 py-2 text-xs text-platinum-faint">
-                {formatDateTime(mod.scannedAt)}
-              </td>
-              <td className="px-3 py-2 text-right">
-                <a
-                  href={wfmItemUrl(mod.urlName)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Open ${mod.itemName} on warframe.market`}
-                  className="text-platinum-faint transition-colors hover:text-teal"
-                >
-                  <ExternalLink size={14} />
-                </a>
-              </td>
+    <div className="flex flex-col gap-3">
+      <FilterInput value={query} onChange={setQuery} placeholder="Filter mods…" />
+      {filtered.length === 0 ? (
+        <EmptyState>No mods match that filter.</EmptyState>
+      ) : (
+        <TableShell minWidth="640px">
+          <thead>
+            <tr>
+              <Th>Mod</Th>
+              <Th>For</Th>
+              <Th>Sell</Th>
+              <Th>Buy</Th>
+              <Th>Spread</Th>
+              <Th>ROI</Th>
+              <Th>Scanned</Th>
+              <Th />
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filtered.map((mod) => (
+              <Tr key={mod.urlName}>
+                <td className="px-3 py-2">
+                  <ItemNameLink urlName={mod.urlName} name={mod.itemName} thumb={mod.thumb} />
+                </td>
+                <td className="px-3 py-2 text-xs text-platinum-faint">{mod.compat ?? "—"}</td>
+                <td className="font-mono-num px-3 py-2 font-medium text-platinum">
+                  {formatPlatinum(mod.lowestSell)}
+                </td>
+                <td className="font-mono-num px-3 py-2 text-platinum-dim">
+                  {formatPlatinum(mod.highestBuy)}
+                </td>
+                <td className="font-mono-num px-3 py-2 text-platinum-dim">
+                  {formatPlatinum(mod.spread)}
+                </td>
+                <td className="font-mono-num px-3 py-2 text-teal">{formatPercent(mod.roiPct)}</td>
+                <td className="font-mono-num px-3 py-2 text-xs text-platinum-faint">
+                  {formatDateTime(mod.scannedAt)}
+                </td>
+                <td className="px-3 py-2 text-right">
+                  <WfmLink urlName={mod.urlName} itemName={mod.itemName} />
+                </td>
+              </Tr>
+            ))}
+          </tbody>
+        </TableShell>
+      )}
     </div>
   );
 }
@@ -106,7 +105,7 @@ export function SyndicateBrowser({
   return (
     <>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-xs uppercase tracking-wide text-platinum-faint">Show:</span>
+        <span className="text-[11px] tracking-wider text-platinum-faint uppercase">Show</span>
         {SYNDICATES.map((name) => {
           const slug = syndicateSlug(name);
           const isHidden = hidden.has(slug);
@@ -117,7 +116,7 @@ export function SyndicateBrowser({
               onClick={() => toggle(slug)}
               aria-pressed={!isHidden}
               title={isHidden ? `Show ${name}` : `Hide ${name}`}
-              className={`flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-medium transition-colors ${
+              className={`flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs font-medium transition-colors ${
                 isHidden
                   ? "border-line text-platinum-faint line-through hover:text-platinum-dim"
                   : "border-teal-dim bg-teal-dim/10 text-teal hover:bg-teal-dim/20"
@@ -131,16 +130,14 @@ export function SyndicateBrowser({
         <button
           type="button"
           onClick={() => apply(allHidden ? new Set() : new Set(SYNDICATES.map(syndicateSlug)))}
-          className="rounded border border-line px-2.5 py-1 text-xs font-medium text-platinum-dim transition-colors hover:border-teal-dim hover:text-teal"
+          className="rounded-sm border border-line px-2.5 py-1 text-xs font-medium text-platinum-dim transition-colors hover:border-teal-dim hover:text-teal"
         >
           {allHidden ? "Select all" : "Deselect all"}
         </button>
       </div>
 
       {visible.length === 0 ? (
-        <p className="rounded border border-line bg-void-raised px-4 py-6 text-sm text-platinum-dim">
-          All syndicates are hidden. Toggle one back on above.
-        </p>
+        <EmptyState>All syndicates are hidden. Toggle one back on above.</EmptyState>
       ) : (
         visible.map((section) => (
           <section key={section.syndicate} className="flex flex-col gap-2">
@@ -157,9 +154,8 @@ export function SyndicateBrowser({
               />
             </div>
             {section.unscanned ? (
-              <p className="rounded border border-line bg-void-raised px-4 py-3 text-xs text-platinum-faint">
-                Not scanned yet — prices appear once the scan cycle reaches these mods, or
-                press &ldquo;Sync all&rdquo;.
+              <p className="rounded-sm border border-line bg-void-raised px-4 py-3 text-xs text-platinum-faint">
+                Not scanned yet — prices appear after a scan, or press Sync all.
               </p>
             ) : null}
             <SyndicateTable section={section} />

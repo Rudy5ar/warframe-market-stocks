@@ -3,18 +3,10 @@ import "server-only";
 import { createServiceClient } from "@/lib/supabase/server";
 
 import { RELIC_CATALOG, computeRelicEv } from "./relics";
-import type { RelicEra, RelicEntry } from "./relics";
+import type { RelicEntry } from "./relics";
+import type { RelicBoardRow } from "./types";
 
-export interface RelicBoardRow {
-  name: string;
-  era: RelicEra;
-  code: string;
-  vaulted: boolean;
-  intactEv: number | null;
-  radiantEv: number | null;
-  pricedDrops: number;
-  totalDrops: number;
-}
+export type { RelicBoardRow };
 
 async function loadPartPrices(
   urlNames: string[],

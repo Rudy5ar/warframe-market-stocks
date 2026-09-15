@@ -10,7 +10,6 @@ export {
   DEFAULT_MIN_SNIPE_VOLUME,
   computeMedian48h,
   isPriceDrop,
-  priceDropDiscountPct,
 } from "./priceDrop";
 export type { PriceDropOptions } from "./priceDrop";
 

@@ -3,7 +3,7 @@ import type { WfmItemStatistics } from "@/lib/wfm";
 /** A price drop fires when `lowestSell < median_48h * PRICE_DROP_RATIO`. */
 export const PRICE_DROP_RATIO = 0.85;
 
-/** Minimum 48h closed volume required for snipes / price-drop alerts. */
+/** Minimum 48h closed volume required for price-drop alerts. */
 export const DEFAULT_MIN_SNIPE_VOLUME = 5;
 
 /**
@@ -38,7 +38,7 @@ export interface PriceDropOptions {
   volume?: number | null;
 }
 
-/** Whether `lowestSell` qualifies as a snipe / price drop against `median48h`. */
+/** Whether `lowestSell` qualifies as a price drop against `median48h`. */
 export function isPriceDrop(
   lowestSell: number | null,
   median48h: number | null,
@@ -62,13 +62,4 @@ export function isPriceDrop(
   }
 
   return true;
-}
-
-/** Discount vs median as a percent: `(1 - lowestSell/median) * 100`. */
-export function priceDropDiscountPct(
-  lowestSell: number,
-  median48h: number,
-): number {
-  if (median48h <= 0) return 0;
-  return (1 - lowestSell / median48h) * 100;
 }

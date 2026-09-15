@@ -76,7 +76,7 @@ export function SyndicateSyncButton({
         type="button"
         onClick={handleSync}
         disabled={urlNames.length === 0}
-        className="flex items-center gap-1.5 rounded border border-line px-2.5 py-1 text-xs font-medium text-platinum-dim transition-colors hover:border-teal-dim hover:text-teal disabled:opacity-50"
+        className="flex items-center gap-1.5 rounded-sm border border-line px-2.5 py-1 text-xs font-medium text-platinum-dim transition-colors hover:border-teal-dim hover:text-teal disabled:opacity-50"
       >
         <RefreshCw size={12} />
         Sync all ({urlNames.length})

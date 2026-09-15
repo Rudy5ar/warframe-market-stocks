@@ -3,10 +3,10 @@
 :root {
   /* Void steel / cold platinum palette */
   --void: #0b0d0e;
-  --void-raised: #121516;
-  --void-panel: #171b1d;
-  --line: #262c2f;
-  --line-strong: #363e41;
+  --void-raised: #14191b;
+  --void-panel: #1b2124;
+  --line: #2c3538;
+  --line-strong: #3d484c;
 
   --platinum: #e8edee;
   --platinum-dim: #a8b3b5;
@@ -56,7 +56,11 @@ html {
 }
 
 body {
-  background: var(--background);
+  background-color: var(--void);
+  background-image:
+    radial-gradient(ellipse 80% 42% at 50% -8%, rgb(62 207 184 / 0.18), transparent 58%),
+    radial-gradient(ellipse 36% 28% at 100% 0%, rgb(226 161 61 / 0.09), transparent 52%);
+  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
 }
@@ -66,7 +70,57 @@ body {
   color: var(--platinum);
 }
 
-/* Thin scrollbars for horizontally-scrolling tables on mobile */
+:focus-visible {
+  outline: 1px solid var(--teal);
+  outline-offset: 2px;
+}
+
+.scan-filament {
+  position: relative;
+  height: 2px;
+  overflow: hidden;
+  background: var(--line);
+  box-shadow: 0 0 18px rgb(62 207 184 / 0.35);
+}
+
+.scan-filament::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 22%;
+  background: var(--teal);
+}
+
+.scan-filament[data-status="running"]::after {
+  width: 24%;
+  animation: filament-sweep 2.4s ease-in-out infinite;
+}
+
+.scan-filament[data-status="error"]::after {
+  width: 100%;
+  background: var(--red);
+}
+
+.scan-filament[data-status="error"] {
+  box-shadow: 0 0 18px rgb(217 112 90 / 0.4);
+}
+
+@keyframes filament-sweep {
+  0% {
+    transform: translateX(-120%);
+  }
+  100% {
+    transform: translateX(520%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scan-filament[data-status="running"]::after {
+    animation: none;
+    width: 40%;
+  }
+}
+
 .scroll-thin::-webkit-scrollbar {
   height: 6px;
   width: 6px;
@@ -86,5 +140,17 @@ body {
   .font-mono-num {
     font-family: var(--font-mono);
     font-feature-settings: "tnum" 1;
+  }
+  .lane-teal {
+    border-left: 3px solid var(--teal);
+    background: color-mix(in srgb, var(--teal-dim) 22%, var(--void-raised));
+  }
+  .lane-amber {
+    border-left: 3px solid var(--amber);
+    background: color-mix(in srgb, var(--amber-dim) 28%, var(--void-raised));
+  }
+  .lane-red {
+    border-left: 3px solid var(--red);
+    background: color-mix(in srgb, var(--red) 12%, var(--void-raised));
   }
 }

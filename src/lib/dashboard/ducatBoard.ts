@@ -8,27 +8,15 @@ import {
   platPerDucat,
   recommendDucatAction,
 } from "./ducats";
-import type { DucatRecommendation } from "./ducats";
+import type { DucatBoardRow, DucatSort } from "./types";
+
+export type { DucatBoardRow, DucatSort };
 
 function envFloat(name: string, fallback: number): number {
   const raw = process.env[name];
   const parsed = raw !== undefined ? Number.parseFloat(raw) : NaN;
   return Number.isFinite(parsed) ? parsed : fallback;
 }
-
-export interface DucatBoardRow {
-  urlName: string;
-  itemName: string;
-  thumb: string | null;
-  ducats: number;
-  lowestSell: number | null;
-  volume48h: number | null;
-  scannedAt: string | null;
-  platPerDucat: number | null;
-  recommendation: DucatRecommendation;
-}
-
-export type DucatSort = "plat_per_ducat" | "sell";
 
 /** Prime parts ranked for sell-on-market vs junk-for-ducats. */
 export async function getDucatBoard(
