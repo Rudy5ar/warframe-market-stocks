@@ -1,78 +1,78 @@
-import Link from "next/link";
-import { ExternalLink } from "lucide-react";
+"use client";
 
-import type { OpportunityRow } from "@/lib/dashboard";
-import { formatDateTime, formatPercent, formatPlatinum, formatVolume, wfmItemUrl } from "@/lib/format";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { FilterInput, useTextFilter } from "@/components/ui/FilterInput";
+import { ItemNameLink } from "@/components/ui/ItemNameLink";
+import { TableShell, Th, Tr } from "@/components/ui/TableShell";
+import { WfmLink } from "@/components/ui/WfmLink";
+import type { OpportunityRow } from "@/lib/dashboard/types";
+import { formatDateTime, formatPercent, formatPlatinum, formatVolume } from "@/lib/format";
 
 export function OpportunitiesTable({ rows }: { rows: OpportunityRow[] }) {
+  const { query, setQuery, filtered } = useTextFilter(
+    rows,
+    (row) => `${row.itemName} ${row.urlName}`,
+  );
+
   if (rows.length === 0) {
     return (
-      <p className="rounded border border-line bg-void-raised px-4 py-6 text-sm text-platinum-dim">
-        No opportunities clear the current spread/ROI thresholds yet. Check back after the next
-        scan cycle.
-      </p>
+      <EmptyState>
+        No flips clear the spread and ROI bar yet. Wait for the next scan.
+      </EmptyState>
     );
   }
 
   return (
-    <div className="scroll-thin overflow-x-auto rounded border border-line">
-      <table className="w-full min-w-[720px] border-collapse text-sm">
-        <thead>
-          <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-platinum-faint">
-            <th className="px-3 py-2 font-medium">Item</th>
-            <th className="px-3 py-2 font-medium">Sell</th>
-            <th className="px-3 py-2 font-medium">Buy</th>
-            <th className="px-3 py-2 font-medium">Spread</th>
-            <th className="px-3 py-2 font-medium">ROI</th>
-            <th className="px-3 py-2 font-medium">Vol 48h</th>
-            <th className="px-3 py-2 font-medium">Scanned</th>
-            <th className="px-3 py-2 font-medium" />
-          </tr>
-        </thead>
-        <tbody>
-          {rows.map((row) => (
-            <tr
-              key={row.urlName}
-              className="border-b border-line last:border-b-0 transition-colors hover:bg-void-raised"
-            >
-              <td className="px-3 py-2">
-                <Link href={`/items/${row.urlName}`} className="text-platinum hover:text-teal">
-                  {row.itemName}
-                </Link>
-              </td>
-              <td className="font-mono-num px-3 py-2 text-platinum-dim">
-                {formatPlatinum(row.lowestSell)}
-              </td>
-              <td className="font-mono-num px-3 py-2 text-platinum-dim">
-                {formatPlatinum(row.highestBuy)}
-              </td>
-              <td className="font-mono-num px-3 py-2 text-platinum">
-                {formatPlatinum(row.spread)}
-              </td>
-              <td className="font-mono-num px-3 py-2 font-medium text-teal">
-                {formatPercent(row.roiPct)}
-              </td>
-              <td className="font-mono-num px-3 py-2 text-platinum-dim">
-                {formatVolume(row.volume48h)}
-              </td>
-              <td className="font-mono-num px-3 py-2 text-xs text-platinum-faint">
-                {formatDateTime(row.scannedAt)}
-              </td>
-              <td className="px-3 py-2 text-right">
-                <a
-                  href={wfmItemUrl(row.urlName)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={`Open ${row.itemName} on warframe.market`}
-                  className="text-platinum-faint transition-colors hover:text-teal"
-                >
-                  <ExternalLink size={14} />
-                </a>
-              </td>
+    <div className="flex flex-col gap-3">
+      <FilterInput value={query} onChange={setQuery} placeholder="Filter flips…" />
+      {filtered.length === 0 ? (
+        <EmptyState>No flips match that filter.</EmptyState>
+      ) : (
+        <TableShell>
+          <thead>
+            <tr>
+              <Th>Item</Th>
+              <Th>Sell</Th>
+              <Th>Buy</Th>
+              <Th>Spread</Th>
+              <Th>ROI</Th>
+              <Th>Vol 48h</Th>
+              <Th>Scanned</Th>
+              <Th />
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {filtered.map((row) => (
+              <Tr key={row.urlName}>
+                <td className="px-3 py-2">
+                  <ItemNameLink urlName={row.urlName} name={row.itemName} thumb={row.thumb} />
+                </td>
+                <td className="font-mono-num px-3 py-2 text-platinum-dim">
+                  {formatPlatinum(row.lowestSell)}
+                </td>
+                <td className="font-mono-num px-3 py-2 text-platinum-dim">
+                  {formatPlatinum(row.highestBuy)}
+                </td>
+                <td className="font-mono-num px-3 py-2 text-platinum">
+                  {formatPlatinum(row.spread)}
+                </td>
+                <td className="font-mono-num px-3 py-2 font-medium text-teal">
+                  {formatPercent(row.roiPct)}
+                </td>
+                <td className="font-mono-num px-3 py-2 text-platinum-dim">
+                  {formatVolume(row.volume48h)}
+                </td>
+                <td className="font-mono-num px-3 py-2 text-xs text-platinum-faint">
+                  {formatDateTime(row.scannedAt)}
+                </td>
+                <td className="px-3 py-2 text-right">
+                  <WfmLink urlName={row.urlName} itemName={row.itemName} />
+                </td>
+              </Tr>
+            ))}
+          </tbody>
+        </TableShell>
+      )}
     </div>
   );
 }

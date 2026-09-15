@@ -39,7 +39,7 @@ export default function RootLayout({
         className={`${outfit.variable} ${syne.variable} ${plexMono.variable} min-h-screen antialiased`}
       >
         <SiteHeader />
-        <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{children}</main>
+        <main className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
       </body>
     </html>
   );

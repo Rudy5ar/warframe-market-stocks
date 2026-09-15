@@ -51,11 +51,3 @@ export function isPriceDrop(
 
   return true;
 }
-
-export function priceDropDiscountPct(
-  lowestSell: number,
-  median48h: number,
-): number {
-  if (median48h <= 0) return 0;
-  return (1 - lowestSell / median48h) * 100;
-}

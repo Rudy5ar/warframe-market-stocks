@@ -1,32 +1,38 @@
 export type {
   AlertRow,
+  CatalogHit,
   HistoryPoint,
   ItemDetail,
   MarketableModRow,
   ModStashRow,
   OpportunityRow,
   ScanStatusSummary,
-  SnipeRow,
   SyndicateAugmentRow,
   SyndicateSection,
   WatchlistRow,
+  DucatBoardRow,
+  DucatSort,
+  RelicBoardRow,
 } from "./types";
 
 export {
   getItemDetail,
   getRecentAlerts,
+  getScanPulse,
   getScanStatus,
-  getSnipes,
   getSyndicateAugments,
   getTopOpportunities,
   getWatchlist,
+  searchCatalog,
 } from "./queries";
+
+export { getHomeBriefing } from "./home";
+export type { HomeBriefing, HomeListMod } from "./home";
 
 export { getMarketableMods, getModStash } from "./modStash";
 export { getAllDucatUrlNames, getDucatBoard } from "./ducatBoard";
-export type { DucatBoardRow, DucatSort } from "./ducatBoard";
 export { getAllRelicPartUrlNames, getRelicBoard } from "./relicBoard";
-export type { RelicBoardRow, RelicBoardFilters } from "./relicBoard";
+export type { RelicBoardFilters } from "./relicBoard";
 
 export {
   addModStashItem,
@@ -36,5 +42,6 @@ export {
   removeWatchlistItem,
   scanItemChunk,
   scanSyndicateMods,
+  searchCatalogAction,
 } from "./actions";
 export type { ScanChunkResult } from "./actions";
