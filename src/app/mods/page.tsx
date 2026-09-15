@@ -4,8 +4,10 @@ import {
 } from "@/components/ModStashForms";
 import { DiscoveryTable, StashTable } from "@/components/ModsTables";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { SignInHint } from "@/components/ui/SignInHint";
 import { getMarketableMods, getModStash } from "@/lib/dashboard";
 import { DEFAULT_MIN_MOD_SELL_PLAT } from "@/lib/market";
+import { getAuthUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +16,11 @@ export const metadata = {
 };
 
 export default async function ModsPage() {
-  const [stash, marketable] = await Promise.all([getModStash(), getMarketableMods(50)]);
+  const user = await getAuthUser();
+  const [stash, marketable] = await Promise.all([
+    user ? getModStash() : Promise.resolve([]),
+    getMarketableMods(50),
+  ]);
   const minSell = Number.parseFloat(process.env.MIN_MOD_SELL_PLAT ?? "") || DEFAULT_MIN_MOD_SELL_PLAT;
 
   return (
@@ -26,9 +32,15 @@ export default async function ModsPage() {
 
       <section className="flex flex-col gap-3">
         <h2 className="font-display text-base font-semibold text-platinum">Your stash</h2>
-        <AddModStashForm />
-        <BulkAddModStashForm />
-        <StashTable rows={stash} />
+        {user ? (
+          <>
+            <AddModStashForm />
+            <BulkAddModStashForm />
+            <StashTable rows={stash} />
+          </>
+        ) : (
+          <SignInHint next="/mods">to keep a private mod stash.</SignInHint>
+        )}
       </section>
 
       <section className="flex flex-col gap-3">

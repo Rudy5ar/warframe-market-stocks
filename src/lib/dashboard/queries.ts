@@ -1,7 +1,7 @@
 import "server-only";
 
 import { DEFAULT_SPREAD_THRESHOLDS } from "@/lib/market";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createServiceClient, createUserClient } from "@/lib/supabase/server";
 
 import { SYNDICATES, findSyndicateMod } from "./syndicates";
 import type { SyndicateModEntry } from "./syndicates";
@@ -135,9 +135,13 @@ export async function getRecentAlerts(limit = 20): Promise<AlertRow[]> {
 
 /** All pinned watchlist items, most recently pinned first, with current snapshot metrics. */
 export async function getWatchlist(): Promise<WatchlistRow[]> {
-  const supabase = createServiceClient();
+  const userClient = await createUserClient();
+  const {
+    data: { user },
+  } = await userClient.auth.getUser();
+  if (!user) return [];
 
-  const { data: pins, error: pinsError } = await supabase
+  const { data: pins, error: pinsError } = await userClient
     .from("watchlist")
     .select("url_name, created_at")
     .order("created_at", { ascending: false });
@@ -148,13 +152,14 @@ export async function getWatchlist(): Promise<WatchlistRow[]> {
 
   const rows = pins ?? [];
   const urlNames = rows.map((row) => row.url_name);
+  const catalog = createServiceClient();
 
-  const itemsByUrlName = await fetchItemNamesByUrlName(supabase, urlNames);
+  const itemsByUrlName = await fetchItemNamesByUrlName(catalog, urlNames);
 
   const { data: snapshots, error: snapshotsError } =
     urlNames.length === 0
       ? { data: [], error: null }
-      : await supabase
+      : await catalog
           .from("item_snapshots")
           .select("url_name, lowest_sell, spread, roi_pct, scanned_at")
           .in("url_name", urlNames);
@@ -341,7 +346,9 @@ export async function getItemDetail(urlName: string): Promise<ItemDetail | null>
         .eq("url_name", normalized)
         .order("scanned_at", { ascending: false })
         .limit(50),
-      supabase.from("watchlist").select("url_name").eq("url_name", normalized).maybeSingle(),
+      createUserClient().then((userClient) =>
+        userClient.from("watchlist").select("url_name").eq("url_name", normalized).maybeSingle(),
+      ),
       supabase
         .from("alerts")
         .select("id, type, url_name, payload, alert_day, created_at")
@@ -353,7 +360,6 @@ export async function getItemDetail(urlName: string): Promise<ItemDetail | null>
   if (itemResult.error) throw new Error(`getItemDetail: ${itemResult.error.message}`);
   if (snapshotResult.error) throw new Error(`getItemDetail: ${snapshotResult.error.message}`);
   if (historyResult.error) throw new Error(`getItemDetail: ${historyResult.error.message}`);
-  if (watchlistResult.error) throw new Error(`getItemDetail: ${watchlistResult.error.message}`);
   if (alertsResult.error) throw new Error(`getItemDetail: ${alertsResult.error.message}`);
 
   const item = itemResult.data;

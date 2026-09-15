@@ -5,6 +5,7 @@ import { ItemThumb } from "@/components/ui/ItemThumb";
 import { getHomeBriefing } from "@/lib/dashboard";
 import { alertDetail } from "@/lib/dashboard/alertText";
 import { formatPercent, formatPlatinum } from "@/lib/format";
+import { getAuthUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -53,7 +54,10 @@ function LaneCard({
 }
 
 export default async function HomePage() {
-  const { flips, drops, listMods, relic } = await getHomeBriefing();
+  const [{ flips, drops, listMods, relic }, user] = await Promise.all([
+    getHomeBriefing(),
+    getAuthUser(),
+  ]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -100,7 +104,9 @@ export default async function HomePage() {
           <QueueHeader title="Don't dissolve" href="/mods" label="All mods" tone="amber" />
           {listMods.length === 0 ? (
             <p className="lane-amber rounded-sm border border-line px-4 py-5 text-sm text-platinum-dim">
-              Nothing in your stash is worth listing yet. Add excess rares on Mods.
+              {user
+                ? "Nothing in your stash is worth listing yet. Add excess rares on Mods."
+                : "Sign in and add excess rares on Mods to see list recs here."}
             </p>
           ) : (
             <ul className="flex flex-col gap-2">

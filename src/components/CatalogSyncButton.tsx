@@ -22,12 +22,14 @@ export function CatalogSyncButton({
   const router = useRouter();
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null);
   const [failedCount, setFailedCount] = useState(0);
+  const [notice, setNotice] = useState<string | null>(null);
 
   const syncing = progress !== null;
   const pct = progress && progress.total > 0 ? Math.round((progress.done / progress.total) * 100) : 0;
 
   async function handleSync() {
     setFailedCount(0);
+    setNotice(null);
     setProgress({ done: 0, total: urlNames.length });
 
     let failures = 0;
@@ -35,6 +37,11 @@ export function CatalogSyncButton({
       const chunk = urlNames.slice(i, i + CHUNK_SIZE);
       try {
         const result = await scanItemChunk(chunk);
+        if (result.failed.includes("Sign in to sync catalog prices.")) {
+          setNotice("Sign in to sync catalog prices.");
+          setProgress(null);
+          return;
+        }
         failures += result.failed.length;
       } catch {
         failures += chunk.length;
@@ -64,6 +71,7 @@ export function CatalogSyncButton({
 
   return (
     <div className="flex items-center gap-2">
+      {notice ? <span className="text-xs text-amber">{notice}</span> : null}
       {failedCount > 0 ? (
         <span className="text-xs text-amber">{failedCount} failed</span>
       ) : null}

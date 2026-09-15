@@ -6,7 +6,7 @@ import {
   rarityFromTags,
   recommendModAction,
 } from "@/lib/market";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createServiceClient, createUserClient } from "@/lib/supabase/server";
 
 import { isFodderMod } from "./fodderMods";
 import type { MarketableModRow, ModStashRow } from "./types";
@@ -48,10 +48,16 @@ async function fetchItemsMeta(
 
 /** Personal mod stash with list-vs-dissolve recommendations. */
 export async function getModStash(): Promise<ModStashRow[]> {
+  const userClient = await createUserClient();
+  const {
+    data: { user },
+  } = await userClient.auth.getUser();
+  if (!user) return [];
+
   const supabase = createServiceClient();
   const minSell = envFloat("MIN_MOD_SELL_PLAT", DEFAULT_MIN_MOD_SELL_PLAT);
 
-  const { data: pins, error: pinsError } = await supabase
+  const { data: pins, error: pinsError } = await userClient
     .from("mod_stash")
     .select("url_name, quantity, created_at")
     .order("created_at", { ascending: false });

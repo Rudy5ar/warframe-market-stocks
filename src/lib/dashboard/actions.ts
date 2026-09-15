@@ -1,10 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { searchCatalog } from "@/lib/dashboard/queries";
 import { readThresholds, scanOneItem } from "@/lib/scan/scanItem";
-import { createServiceClient } from "@/lib/supabase/server";
+import { createServiceClient, createUserClient, getAuthUser } from "@/lib/supabase/server";
 
 /**
  * Hard cap per call so a single action stays well inside serverless time
@@ -25,15 +26,25 @@ function parseQuantity(raw: FormDataEntryValue | null): number {
   return Number.isFinite(parsed) && parsed >= 1 ? parsed : 1;
 }
 
+async function requireUserClient() {
+  const supabase = await createUserClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) redirect("/login");
+  return { supabase, user };
+}
+
 /** Pins an item so the scan cron prioritizes it. Safe to call for an already-pinned url_name. */
 export async function addWatchlistItem(formData: FormData): Promise<void> {
   const urlName = normalizeUrlName(formData.get("urlName"));
   if (!urlName) return;
 
-  const supabase = createServiceClient();
-  const { error } = await supabase
-    .from("watchlist")
-    .upsert({ url_name: urlName }, { onConflict: "url_name", ignoreDuplicates: true });
+  const { supabase, user } = await requireUserClient();
+  const { error } = await supabase.from("watchlist").upsert(
+    { user_id: user.id, url_name: urlName },
+    { onConflict: "user_id,url_name", ignoreDuplicates: true },
+  );
 
   if (error) {
     throw new Error(`addWatchlistItem: ${error.message}`);
@@ -54,6 +65,10 @@ export interface ScanChunkResult {
  * Used by syndicate / ducat / relic sync buttons in small sequential chunks.
  */
 export async function scanItemChunk(urlNames: string[]): Promise<ScanChunkResult> {
+  if (!(await getAuthUser())) {
+    return { scanned: 0, failed: ["Sign in to sync catalog prices."] };
+  }
+
   const valid = (Array.isArray(urlNames) ? urlNames : [])
     .filter((urlName) => typeof urlName === "string" && URL_NAME_PATTERN.test(urlName))
     .slice(0, SCAN_CHUNK_MAX);
@@ -83,7 +98,7 @@ export async function removeWatchlistItem(formData: FormData): Promise<void> {
   const urlName = normalizeUrlName(formData.get("urlName"));
   if (!urlName) return;
 
-  const supabase = createServiceClient();
+  const { supabase } = await requireUserClient();
   const { error } = await supabase.from("watchlist").delete().eq("url_name", urlName);
 
   if (error) {
@@ -101,7 +116,7 @@ export async function addModStashItem(formData: FormData): Promise<void> {
   if (!urlName) return;
   const quantity = parseQuantity(formData.get("quantity"));
 
-  const supabase = createServiceClient();
+  const { supabase, user } = await requireUserClient();
   const { data: existing } = await supabase
     .from("mod_stash")
     .select("quantity")
@@ -110,8 +125,8 @@ export async function addModStashItem(formData: FormData): Promise<void> {
 
   const nextQty = (existing?.quantity ?? 0) + quantity;
   const { error } = await supabase.from("mod_stash").upsert(
-    { url_name: urlName, quantity: nextQty },
-    { onConflict: "url_name" },
+    { user_id: user.id, url_name: urlName, quantity: nextQty },
+    { onConflict: "user_id,url_name" },
   );
 
   if (error) {
@@ -134,7 +149,7 @@ export async function bulkAddModStash(formData: FormData): Promise<void> {
 
   if (names.length === 0) return;
 
-  const supabase = createServiceClient();
+  const { supabase, user } = await requireUserClient();
   const unique = [...new Set(names)].slice(0, 100);
 
   const { data: existing } = await supabase
@@ -145,11 +160,14 @@ export async function bulkAddModStash(formData: FormData): Promise<void> {
   const qtyByUrl = new Map((existing ?? []).map((row) => [row.url_name, row.quantity]));
 
   const rows = unique.map((urlName) => ({
+    user_id: user.id,
     url_name: urlName,
     quantity: (qtyByUrl.get(urlName) ?? 0) + 1,
   }));
 
-  const { error } = await supabase.from("mod_stash").upsert(rows, { onConflict: "url_name" });
+  const { error } = await supabase
+    .from("mod_stash")
+    .upsert(rows, { onConflict: "user_id,url_name" });
   if (error) {
     throw new Error(`bulkAddModStash: ${error.message}`);
   }
@@ -162,7 +180,7 @@ export async function removeModStashItem(formData: FormData): Promise<void> {
   const urlName = normalizeUrlName(formData.get("urlName"));
   if (!urlName) return;
 
-  const supabase = createServiceClient();
+  const { supabase } = await requireUserClient();
   const { error } = await supabase.from("mod_stash").delete().eq("url_name", urlName);
 
   if (error) {

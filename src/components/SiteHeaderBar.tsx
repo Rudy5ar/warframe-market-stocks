@@ -7,6 +7,7 @@ import { Menu, X } from "lucide-react";
 
 import { ItemSearch } from "@/components/ItemSearch";
 import { ScanStatusBadge } from "@/components/ScanStatusBadge";
+import { signOut } from "@/lib/auth/actions";
 import type { ScanStatus } from "@/lib/supabase/database.types";
 
 export const NAV_GROUPS = [
@@ -80,12 +81,15 @@ function NavLinks({
 export function SiteHeaderBar({
   status,
   lastRunLabel,
+  userEmail,
 }: {
   status: ScanStatus;
   lastRunLabel: string;
+  userEmail: string | null;
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const loginHref = `/login?next=${encodeURIComponent(pathname || "/")}`;
 
   return (
     <header className="sticky top-0 z-20 border-b border-line bg-void/80 backdrop-blur-md">
@@ -109,6 +113,26 @@ export function SiteHeaderBar({
             <ScanStatusBadge status={status} />
             <span className="hidden sm:inline">{lastRunLabel}</span>
           </Link>
+          {userEmail ? (
+            <form action={signOut} className="hidden items-center gap-2 sm:flex">
+              <span className="max-w-[10rem] truncate text-xs text-platinum-faint" title={userEmail}>
+                {userEmail}
+              </span>
+              <button
+                type="submit"
+                className="text-xs text-platinum-dim hover:text-platinum"
+              >
+                Sign out
+              </button>
+            </form>
+          ) : (
+            <Link
+              href={loginHref}
+              className="hidden text-xs text-teal hover:underline sm:inline"
+            >
+              Sign in
+            </Link>
+          )}
           <button
             type="button"
             className="rounded-sm border border-line p-1.5 text-platinum-dim lg:hidden"
@@ -125,6 +149,22 @@ export function SiteHeaderBar({
         {open ? (
           <nav className="flex flex-col gap-4 border-t border-line py-3 lg:hidden">
             <NavLinks pathname={pathname} onNavigate={() => setOpen(false)} />
+            {userEmail ? (
+              <form action={signOut} className="flex items-center justify-between gap-2">
+                <span className="truncate text-xs text-platinum-faint">{userEmail}</span>
+                <button type="submit" className="text-xs text-platinum-dim hover:text-platinum">
+                  Sign out
+                </button>
+              </form>
+            ) : (
+              <Link
+                href={loginHref}
+                onClick={() => setOpen(false)}
+                className="text-sm text-teal hover:underline"
+              >
+                Sign in
+              </Link>
+            )}
           </nav>
         ) : null}
       </div>

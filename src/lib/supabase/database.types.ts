@@ -189,32 +189,38 @@ export interface Database {
       };
       watchlist: {
         Row: {
+          user_id: string;
           url_name: string;
           created_at: string;
         };
         Insert: {
+          user_id: string;
           url_name: string;
           created_at?: string;
         };
         Update: {
+          user_id?: string;
           url_name?: string;
           created_at?: string;
         };
-        // No FK in migration — pins may exist before manifest sync
+        // No FK to items — pins may exist before manifest sync
         Relationships: [];
       };
       mod_stash: {
         Row: {
+          user_id: string;
           url_name: string;
           quantity: number;
           created_at: string;
         };
         Insert: {
+          user_id: string;
           url_name: string;
           quantity?: number;
           created_at?: string;
         };
         Update: {
+          user_id?: string;
           url_name?: string;
           quantity?: number;
           created_at?: string;
