@@ -7,6 +7,7 @@ import { TableShell, Th, Tr } from "@/components/ui/TableShell";
 import { WfmLink } from "@/components/ui/WfmLink";
 import type { OpportunityRow } from "@/lib/dashboard/types";
 import { formatDateTime, formatPercent, formatPlatinum, formatVolume } from "@/lib/format";
+import { nextSellPrice } from "@/lib/market/spread";
 
 export function OpportunitiesTable({ rows }: { rows: OpportunityRow[] }) {
   const { query, setQuery, filtered } = useTextFilter(
@@ -33,7 +34,7 @@ export function OpportunitiesTable({ rows }: { rows: OpportunityRow[] }) {
             <tr>
               <Th>Item</Th>
               <Th>Sell</Th>
-              <Th>Buy</Th>
+              <Th>Next</Th>
               <Th>Spread</Th>
               <Th>ROI</Th>
               <Th>Vol 48h</Th>
@@ -51,7 +52,7 @@ export function OpportunitiesTable({ rows }: { rows: OpportunityRow[] }) {
                   {formatPlatinum(row.lowestSell)}
                 </td>
                 <td className="font-mono-num px-3 py-2 text-platinum-dim">
-                  {formatPlatinum(row.highestBuy)}
+                  {formatPlatinum(nextSellPrice(row.lowestSell, row.spread))}
                 </td>
                 <td className="font-mono-num px-3 py-2 text-platinum">
                   {formatPlatinum(row.spread)}

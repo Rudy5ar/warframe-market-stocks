@@ -2,6 +2,7 @@ export {
   DEFAULT_SPREAD_THRESHOLDS,
   computeSpreadMetrics,
   isSpreadOpportunity,
+  nextSellPrice,
 } from "./spread";
 export type { SpreadMetrics, SpreadThresholds } from "./spread";
 

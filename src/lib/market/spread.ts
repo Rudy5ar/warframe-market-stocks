@@ -1,5 +1,5 @@
-import { filterActionableOrders } from "@/lib/wfm";
-import type { WfmOrder } from "@/lib/wfm";
+import { filterActionableOrders } from "../wfm/actionable";
+import type { WfmOrder } from "../wfm/types";
 
 export interface SpreadThresholds {
   minSpread: number;
@@ -15,8 +15,17 @@ export const DEFAULT_SPREAD_THRESHOLDS: SpreadThresholds = {
 export interface SpreadMetrics {
   lowestSell: number | null;
   highestBuy: number | null;
+  nextSell: number | null;
   spread: number | null;
   roiPct: number | null;
+}
+
+export function nextSellPrice(
+  lowestSell: number | null,
+  spread: number | null,
+): number | null {
+  if (lowestSell === null || spread === null) return null;
+  return lowestSell + spread;
 }
 
 export function computeSpreadMetrics(orders: WfmOrder[]): SpreadMetrics {
@@ -24,22 +33,24 @@ export function computeSpreadMetrics(orders: WfmOrder[]): SpreadMetrics {
 
   const sellPrices = actionable
     .filter((order) => order.order_type === "sell")
-    .map((order) => order.platinum);
+    .map((order) => order.platinum)
+    .sort((a, b) => a - b);
   const buyPrices = actionable
     .filter((order) => order.order_type === "buy")
     .map((order) => order.platinum);
 
-  const lowestSell = sellPrices.length > 0 ? Math.min(...sellPrices) : null;
+  const lowestSell = sellPrices[0] ?? null;
+  const nextSell = sellPrices.length >= 2 ? sellPrices[1] : null;
   const highestBuy = buyPrices.length > 0 ? Math.max(...buyPrices) : null;
 
-  if (lowestSell === null || highestBuy === null) {
-    return { lowestSell, highestBuy, spread: null, roiPct: null };
+  if (lowestSell === null || nextSell === null) {
+    return { lowestSell, highestBuy, nextSell, spread: null, roiPct: null };
   }
 
-  const spread = lowestSell - highestBuy;
-  const roiPct = highestBuy > 0 ? (spread / highestBuy) * 100 : null;
+  const spread = nextSell - lowestSell;
+  const roiPct = lowestSell > 0 ? (spread / lowestSell) * 100 : null;
 
-  return { lowestSell, highestBuy, spread, roiPct };
+  return { lowestSell, highestBuy, nextSell, spread, roiPct };
 }
 
 export function isSpreadOpportunity(

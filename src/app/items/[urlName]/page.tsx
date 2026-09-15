@@ -17,6 +17,7 @@ import {
   formatVolume,
   wfmItemUrl,
 } from "@/lib/format";
+import { nextSellPrice } from "@/lib/market/spread";
 import { getAuthUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -35,6 +36,7 @@ export default async function ItemDetailPage({ params }: ItemPageProps) {
 
   const stats: Array<{ label: string; value: string; tone?: "teal" | "amber" }> = [
     { label: "Lowest sell", value: formatPlatinum(item.lowestSell) },
+    { label: "Next sell", value: formatPlatinum(nextSellPrice(item.lowestSell, item.spread)) },
     { label: "Highest buy", value: formatPlatinum(item.highestBuy) },
     { label: "Spread", value: formatPlatinum(item.spread), tone: "teal" },
     { label: "ROI", value: formatPercent(item.roiPct), tone: "teal" },
@@ -131,11 +133,12 @@ export default async function ItemDetailPage({ params }: ItemPageProps) {
         {item.history.length === 0 ? (
           <EmptyState>No history recorded yet.</EmptyState>
         ) : (
-          <TableShell minWidth="600px">
+          <TableShell minWidth="680px">
             <thead>
               <tr>
                 <Th>Scanned</Th>
                 <Th>Sell</Th>
+                <Th>Next</Th>
                 <Th>Buy</Th>
                 <Th>Spread</Th>
                 <Th>ROI</Th>
@@ -151,6 +154,9 @@ export default async function ItemDetailPage({ params }: ItemPageProps) {
                   </td>
                   <td className="font-mono-num px-3 py-2 text-platinum-dim">
                     {formatPlatinum(point.lowestSell)}
+                  </td>
+                  <td className="font-mono-num px-3 py-2 text-platinum-dim">
+                    {formatPlatinum(nextSellPrice(point.lowestSell, point.spread))}
                   </td>
                   <td className="font-mono-num px-3 py-2 text-platinum-dim">
                     {formatPlatinum(point.highestBuy)}

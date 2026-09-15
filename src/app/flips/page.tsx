@@ -22,7 +22,7 @@ export default async function FlipsPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Flips"
-        description="Items clearing the spread and ROI bar, ranked for this session."
+        description="In-game listings vs the next in-game ask, ranked for this session."
       />
       <div className="flex flex-wrap gap-2">
         <FilterChip href="/flips" active={sort === "roi"}>

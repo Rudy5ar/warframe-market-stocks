@@ -68,6 +68,7 @@ export default async function HomePage() {
         </h1>
         <p className="max-w-xl text-sm text-platinum-dim">
           Four jobs. Color is the type: teal to flip, amber to list, red when price dropped.
+          Flips are in-game listings versus the next in-game ask.
         </p>
       </header>
 
