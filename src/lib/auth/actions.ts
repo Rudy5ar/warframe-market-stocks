@@ -1,9 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-import { createUserClient } from "@/lib/supabase/server";
+import { createServiceClient, createUserClient } from "@/lib/supabase/server";
 
 import { safeNextPath } from "./paths";
 
@@ -19,6 +18,34 @@ function readEmailPassword(formData: FormData) {
   return { email, password, next };
 }
 
+function isEmailUnconfirmed(message: string): boolean {
+  return /email not confirmed/i.test(message);
+}
+
+function isAlreadyRegistered(message: string): boolean {
+  return /already registered|already exists|already been registered/i.test(message);
+}
+
+/** ponytail: scans first 1k users; switch to admin get-by-email if the user list grows. */
+async function confirmEmail(email: string): Promise<void> {
+  const admin = createServiceClient();
+  const { data, error } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  if (error) return;
+  const user = data.users.find((row) => row.email?.toLowerCase() === email.toLowerCase());
+  if (!user || user.email_confirmed_at) return;
+  await admin.auth.admin.updateUserById(user.id, { email_confirm: true });
+}
+
+async function signInWithPassword(email: string, password: string) {
+  const supabase = await createUserClient();
+  let { error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error && isEmailUnconfirmed(error.message)) {
+    await confirmEmail(email);
+    ({ error } = await supabase.auth.signInWithPassword({ email, password }));
+  }
+  return error;
+}
+
 export async function signIn(
   _prev: AuthFormState,
   formData: FormData,
@@ -28,8 +55,7 @@ export async function signIn(
     return { error: "Email and password are required.", message: null };
   }
 
-  const supabase = await createUserClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const error = await signInWithPassword(email, password);
   if (error) {
     return { error: error.message, message: null };
   }
@@ -49,26 +75,19 @@ export async function signUp(
     return { error: "Password must be at least 6 characters.", message: null };
   }
 
-  const supabase = await createUserClient();
-  const origin =
-    (await headers()).get("origin") ??
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    "http://localhost:3000";
-  const { data, error } = await supabase.auth.signUp({
+  const admin = createServiceClient();
+  const { error: createError } = await admin.auth.admin.createUser({
     email,
     password,
-    options: {
-      emailRedirectTo: `${origin.replace(/\/$/, "")}/auth/callback?next=${encodeURIComponent(next)}`,
-    },
+    email_confirm: true,
   });
+  if (createError && !isAlreadyRegistered(createError.message)) {
+    return { error: createError.message, message: null };
+  }
+
+  const error = await signInWithPassword(email, password);
   if (error) {
     return { error: error.message, message: null };
-  }
-  if (!data.session) {
-    return {
-      error: null,
-      message: "Check your email to confirm the account, then sign in.",
-    };
   }
 
   redirect(next);

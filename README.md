@@ -54,7 +54,7 @@ Never commit `.env.local`, `SUPABASE_SERVICE_ROLE_KEY`, or `CRON_SECRET`. The an
 
 ## Accounts
 
-Email + password via Supabase Auth. Apply `supabase/migrations/` (including `user_accounts`) to the project. In the dashboard: Authentication → URL configuration, set Site URL to the live origin. Confirm-email can stay on (users get a link) or off for password-only sign-in.
+Email + password via Supabase Auth. Apply `supabase/migrations/` (including `user_accounts`) to the project. Signup confirms immediately so the confirm-email link is not required. If you still get a confirm mail pointing at `localhost:3000`, ignore it and **Sign in** with the same password.
 
 ## Scan
 
