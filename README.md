@@ -4,6 +4,8 @@ Personal Warframe.market platinum monitor. Cron scans PC orders into Supabase; t
 
 **Live:** [warframe-market-stocks.vercel.app](https://warframe-market-stocks.vercel.app)
 
+Sign in for a private watchlist and mod stash. Market boards (flips, alerts, relics, ducats) are the shared scan.
+
 ![Command-center home — four job lanes](docs/home.png)
 
 Home is a command center, not a dump of tables. Teal is a flip, amber is “list instead of dissolve,” red is a price drop.
@@ -48,6 +50,12 @@ Fill `.env.local` from `.env.example`:
 
 Optional scan knobs (`MIN_SPREAD`, `MIN_ROI_PCT`, …) live in `.env.example`.
 
+Never commit `.env.local`, `SUPABASE_SERVICE_ROLE_KEY`, or `CRON_SECRET`. The anon key is public by design.
+
+## Accounts
+
+Email + password via Supabase Auth. Apply `supabase/migrations/` (including `user_accounts`) to the project. In the dashboard: Authentication → URL configuration, set Site URL to the live origin. Confirm-email can stay on (users get a link) or off for password-only sign-in.
+
 ## Scan
 
 ```powershell
@@ -58,4 +66,4 @@ Invoke-RestMethod -Method POST -Uri "http://localhost:3000/api/cron/scan" -Heade
 
 Production: GitHub Actions (`APP_URL` + `CRON_SECRET` repo secrets) every 4 hours UTC. Vercel Hobby also hits `/api/cron/scan` once a day at 06:00 UTC.
 
-This is a personal dashboard with no login. Don’t share the live URL widely.
+Cron stays on `CRON_SECRET`. Personal lists are per account (`auth.uid()` + RLS).

@@ -25,7 +25,7 @@ const plexMono = IBM_Plex_Mono({
 export const metadata: Metadata = {
   title: "WF Stocks — Platinum Monitor",
   description:
-    "Personal Warframe.market platinum flip and price-drop monitor: spread/ROI opportunities, alerts, and watchlist.",
+    "Warframe.market platinum flip and price-drop monitor. Shared market boards; your watchlist and mod stash stay on your account.",
 };
 
 export default function RootLayout({

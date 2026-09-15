@@ -1,4 +1,5 @@
 import { ExternalLink } from "lucide-react";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AlertsTable } from "@/components/AlertsList";
@@ -16,6 +17,7 @@ import {
   formatVolume,
   wfmItemUrl,
 } from "@/lib/format";
+import { getAuthUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +27,7 @@ interface ItemPageProps {
 
 export default async function ItemDetailPage({ params }: ItemPageProps) {
   const { urlName } = await params;
-  const item = await getItemDetail(urlName);
+  const [item, user] = await Promise.all([getItemDetail(urlName), getAuthUser()]);
 
   if (!item) {
     notFound();
@@ -67,7 +69,16 @@ export default async function ItemDetailPage({ params }: ItemPageProps) {
             )}
           </div>
         </div>
-        <WatchlistToggleButton urlName={item.urlName} isWatchlisted={item.isWatchlisted} />
+        {user ? (
+          <WatchlistToggleButton urlName={item.urlName} isWatchlisted={item.isWatchlisted} />
+        ) : (
+          <Link
+            href={`/login?next=${encodeURIComponent(`/items/${item.urlName}`)}`}
+            className="rounded-sm border border-line px-3 py-1.5 text-sm text-platinum-dim hover:border-line-strong hover:text-platinum"
+          >
+            Sign in to pin
+          </Link>
+        )}
       </div>
 
       {item.scannedAt === null ? (

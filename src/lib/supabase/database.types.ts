@@ -189,14 +189,17 @@ export interface Database {
       };
       watchlist: {
         Row: {
+          user_id: string;
           url_name: string;
           created_at: string;
         };
         Insert: {
+          user_id: string;
           url_name: string;
           created_at?: string;
         };
         Update: {
+          user_id?: string;
           url_name?: string;
           created_at?: string;
         };
@@ -204,16 +207,19 @@ export interface Database {
       };
       mod_stash: {
         Row: {
+          user_id: string;
           url_name: string;
           quantity: number;
           created_at: string;
         };
         Insert: {
+          user_id: string;
           url_name: string;
           quantity?: number;
           created_at?: string;
         };
         Update: {
+          user_id?: string;
           url_name?: string;
           quantity?: number;
           created_at?: string;
