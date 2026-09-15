@@ -1,5 +1,5 @@
-import { filterActionableOrders } from "@/lib/wfm";
-import type { WfmOrder } from "@/lib/wfm";
+import { filterActionableOrders } from "../wfm/actionable";
+import type { WfmOrder } from "../wfm/types";
 
 /**
  * Thresholds for flagging a spread/ROI opportunity. `minVolume` is optional
@@ -21,38 +21,53 @@ export const DEFAULT_SPREAD_THRESHOLDS: SpreadThresholds = {
 export interface SpreadMetrics {
   lowestSell: number | null;
   highestBuy: number | null;
-  /** `lowestSell - highestBuy`. `null` if either side has no actionable orders. */
+  /** Second-cheapest in-game sell. `null` if fewer than two actionable sells. */
+  nextSell: number | null;
+  /** `nextSell - lowestSell`. `null` if `nextSell` is missing. */
   spread: number | null;
-  /** `(spread / highestBuy) * 100`. `null` if `spread` is `null` or `highestBuy` is 0. */
+  /** `(spread / lowestSell) * 100`. `null` if `spread` is `null` or `lowestSell` is 0. */
   roiPct: number | null;
 }
 
 /**
- * Computes spread/ROI metrics from an item's orders. Filters out unreachable
- * users (`offline`) via `filterActionableOrders` before taking the lowest
- * sell and highest buy price, matching the project's actionable-price rules.
+ * Next in-game ask, derived from persisted `lowest_sell + spread`.
+ * `null` when a flip gap was not stored (fewer than two in-game sells).
+ */
+export function nextSellPrice(
+  lowestSell: number | null,
+  spread: number | null,
+): number | null {
+  if (lowestSell === null || spread === null) return null;
+  return lowestSell + spread;
+}
+
+/**
+ * Computes spread/ROI from in-game visible orders. Buy walls are stored as
+ * `highestBuy` for display only — flip math is cheapest sell vs the next sell.
  */
 export function computeSpreadMetrics(orders: WfmOrder[]): SpreadMetrics {
   const actionable = filterActionableOrders(orders);
 
   const sellPrices = actionable
     .filter((order) => order.order_type === "sell")
-    .map((order) => order.platinum);
+    .map((order) => order.platinum)
+    .sort((a, b) => a - b);
   const buyPrices = actionable
     .filter((order) => order.order_type === "buy")
     .map((order) => order.platinum);
 
-  const lowestSell = sellPrices.length > 0 ? Math.min(...sellPrices) : null;
+  const lowestSell = sellPrices[0] ?? null;
+  const nextSell = sellPrices.length >= 2 ? sellPrices[1] : null;
   const highestBuy = buyPrices.length > 0 ? Math.max(...buyPrices) : null;
 
-  if (lowestSell === null || highestBuy === null) {
-    return { lowestSell, highestBuy, spread: null, roiPct: null };
+  if (lowestSell === null || nextSell === null) {
+    return { lowestSell, highestBuy, nextSell, spread: null, roiPct: null };
   }
 
-  const spread = lowestSell - highestBuy;
-  const roiPct = highestBuy > 0 ? (spread / highestBuy) * 100 : null;
+  const spread = nextSell - lowestSell;
+  const roiPct = lowestSell > 0 ? (spread / lowestSell) * 100 : null;
 
-  return { lowestSell, highestBuy, spread, roiPct };
+  return { lowestSell, highestBuy, nextSell, spread, roiPct };
 }
 
 /**

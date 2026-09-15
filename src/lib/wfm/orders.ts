@@ -29,13 +29,3 @@ export async function getItemOrders(urlName: string): Promise<WfmOrder[]> {
   const orders = await wfmRequestV2<WfmV2Order[]>(`/orders/item/${urlName}`);
   return orders.map(mapV2Order);
 }
-
-/**
- * Keeps only orders from users who are actually reachable to trade
- * (`ingame` or `online`), matching the project's actionable-price rules.
- */
-export function filterActionableOrders(orders: WfmOrder[]): WfmOrder[] {
-  return orders.filter(
-    (order) => order.user.status === "ingame" || order.user.status === "online",
-  );
-}

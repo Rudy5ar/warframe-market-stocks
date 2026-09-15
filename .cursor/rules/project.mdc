@@ -24,7 +24,7 @@ Personal platinum flip / price-drop monitor. Free-tier only.
 `items`, `scan_cursor`, `item_snapshots`, `item_snapshot_history`, `alerts`, `watchlist`
 
 ## Algorithms
-- Spread/ROI: online+ingame orders; defaults spread ≥ 5p, ROI ≥ 15%, min volume
+- Spread/ROI: visible in-game sells; cheapest vs next listing; ROI = spread / lowest sell; defaults spread ≥ 5p, ROI ≥ 15%
 - Price drop: `lowest_sell < median_48h * 0.85`; 24h alert dedupe
 - Stats only when needed for price-drop (or every Nth full cycle)
 
