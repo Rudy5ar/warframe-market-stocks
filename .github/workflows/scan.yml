@@ -2,7 +2,7 @@
 # Backup: vercel.json daily cron at 06:00 UTC (Hobby 1/day limit).
 # Phase 2 /api/cron/scan must accept: Authorization: Bearer <CRON_SECRET>
 #
-# Repo secrets: APP_URL (no trailing slash), CRON_SECRET (same value as Vercel env)
+# Repo secret: CRON_SECRET (same value as Vercel env)
 name: Scan cron
 
 on:
@@ -17,7 +17,7 @@ jobs:
     steps:
       - name: POST /api/cron/scan
         env:
-          APP_URL: ${{ secrets.APP_URL }}
+          APP_URL: https://warframe-market-stocks.vercel.app
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
           curl -fsS -X POST \
