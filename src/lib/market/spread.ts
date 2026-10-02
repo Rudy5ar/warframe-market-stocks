@@ -29,15 +29,24 @@ export function nextSellPrice(
 }
 
 export function computeSpreadMetrics(orders: WfmOrder[]): SpreadMetrics {
-  const actionable = filterActionableOrders(orders);
+  const actionable = filterActionableOrders(orders).map((order) => ({
+    order,
+    unit: Math.round(order.platinum / Math.max(order.per_trade ?? 1, 1)),
+    variant: `${order.rank ?? ""}|${order.subtype ?? ""}`,
+  }));
 
-  const sellPrices = actionable
-    .filter((order) => order.order_type === "sell")
-    .map((order) => order.platinum)
+  const cheapest = actionable
+    .filter((o) => o.order.order_type === "sell")
+    .sort((a, b) => a.unit - b.unit)[0];
+  const sameVariant = cheapest
+    ? actionable.filter((o) => o.variant === cheapest.variant)
+    : actionable;
+
+  const sellPrices = sameVariant
+    .filter((o) => o.order.order_type === "sell")
+    .map((o) => o.unit)
     .sort((a, b) => a - b);
-  const buyPrices = actionable
-    .filter((order) => order.order_type === "buy")
-    .map((order) => order.platinum);
+  const buyPrices = sameVariant.filter((o) => o.order.order_type === "buy").map((o) => o.unit);
 
   const lowestSell = sellPrices[0] ?? null;
   const nextSell = sellPrices.length >= 2 ? sellPrices[1] : null;

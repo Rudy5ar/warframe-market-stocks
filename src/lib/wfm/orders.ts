@@ -10,6 +10,9 @@ function mapV2Order(order: WfmV2Order): WfmOrder {
     platform: order.user.platform ?? "pc",
     region: order.user.locale ?? "",
     visible: order.visible,
+    rank: order.rank,
+    subtype: order.subtype,
+    per_trade: order.perTrade,
     creation_date: order.createdAt,
     last_update: order.updatedAt,
     user: {

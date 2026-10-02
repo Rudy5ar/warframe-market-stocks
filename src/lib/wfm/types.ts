@@ -29,6 +29,9 @@ export interface WfmOrder {
   platform: string;
   region: string;
   visible: boolean;
+  rank?: number;
+  subtype?: string;
+  per_trade?: number;
   creation_date?: string;
   last_update?: string;
   user: WfmOrderUser;
@@ -79,6 +82,9 @@ export interface WfmV2Order {
   platinum: number;
   quantity: number;
   visible: boolean;
+  rank?: number;
+  subtype?: string;
+  perTrade?: number;
   createdAt?: string;
   updatedAt?: string;
   user: {
