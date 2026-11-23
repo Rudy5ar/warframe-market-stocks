@@ -8,9 +8,14 @@ export async function GET(request: Request) {
   const code = url.searchParams.get("code");
   const next = safeNextPath(url.searchParams.get("next"));
 
-  if (code) {
-    const supabase = await createUserClient();
-    await supabase.auth.exchangeCodeForSession(code);
+  if (!code) {
+    return NextResponse.redirect(new URL("/login", url.origin));
+  }
+
+  const supabase = await createUserClient();
+  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  if (error) {
+    return NextResponse.redirect(new URL("/login?error=callback", url.origin));
   }
 
   return NextResponse.redirect(new URL(next, url.origin));

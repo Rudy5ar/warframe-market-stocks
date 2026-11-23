@@ -24,42 +24,57 @@ function AddSubmitButton() {
 export function AddModStashForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [pickerKey, setPickerKey] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   return (
-    <form
-      ref={formRef}
-      action={async (formData) => {
-        await addModStashItem(formData);
-        formRef.current?.reset();
-        setPickerKey((key) => key + 1);
-      }}
-      className="flex flex-wrap gap-2"
-    >
-      <CatalogPicker
-        key={pickerKey}
-        placeholder="Search or paste a mod, e.g. Transient Fortitude"
-      />
-      <input
-        name="quantity"
-        type="number"
-        min={1}
-        defaultValue={1}
-        className="w-20 rounded-sm border border-line bg-void-panel px-3 py-2 text-sm text-platinum"
-        aria-label="Quantity"
-      />
-      <AddSubmitButton />
-    </form>
+    <div className="flex flex-col gap-2">
+      <form
+        ref={formRef}
+        action={async (formData) => {
+          setError(null);
+          const result = await addModStashItem(formData);
+          if (result.error) {
+            setError(result.error);
+            return;
+          }
+          formRef.current?.reset();
+          setPickerKey((key) => key + 1);
+        }}
+        className="flex flex-wrap gap-2"
+      >
+        <CatalogPicker
+          key={pickerKey}
+          placeholder="Search or paste a mod, e.g. Transient Fortitude"
+        />
+        <input
+          name="quantity"
+          type="number"
+          min={1}
+          defaultValue={1}
+          className="w-20 rounded-sm border border-line bg-void-panel px-3 py-2 text-sm text-platinum"
+          aria-label="Quantity"
+        />
+        <AddSubmitButton />
+      </form>
+      {error ? <p className="text-sm text-red">{error}</p> : null}
+    </div>
   );
 }
 
 export function BulkAddModStashForm() {
   const formRef = useRef<HTMLFormElement>(null);
+  const [error, setError] = useState<string | null>(null);
 
   return (
     <form
       ref={formRef}
       action={async (formData) => {
-        await bulkAddModStash(formData);
+        setError(null);
+        const result = await bulkAddModStash(formData);
+        if (result.error) {
+          setError(result.error);
+          return;
+        }
         formRef.current?.reset();
       }}
       className="flex flex-col gap-2"
@@ -70,6 +85,7 @@ export function BulkAddModStashForm() {
         placeholder={"Paste names, one per line or comma-separated\ntransient_fortitude\nblind_rage"}
         className="w-full rounded-sm border border-line bg-void-panel px-3 py-2 text-sm text-platinum placeholder:text-platinum-faint"
       />
+      {error ? <p className="text-sm text-red">{error}</p> : null}
       <button
         type="submit"
         className="self-start rounded-sm border border-line px-3 py-1.5 text-sm text-platinum-dim transition-colors hover:border-teal-dim hover:text-teal"

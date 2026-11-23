@@ -3,12 +3,19 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { isAdminUser } from "@/lib/auth/policy";
+import { MAX_MOD_STASH_ITEMS, MAX_WATCHLIST_PINS } from "@/lib/config/limits";
 import { searchCatalog } from "@/lib/dashboard/queries";
 import { readThresholds, scanOneItem } from "@/lib/scan/scanItem";
 import { createServiceClient, createUserClient, getAuthUser } from "@/lib/supabase/server";
 
 const SCAN_CHUNK_MAX = 25;
 const URL_NAME_PATTERN = /^[a-z0-9_]+$/;
+const OWNER_ONLY_SCAN_ERROR = "Owner access required to sync catalog prices.";
+
+export interface MutationResult {
+  error: string | null;
+}
 
 function normalizeUrlName(raw: FormDataEntryValue | null): string | null {
   if (typeof raw !== "string") return null;
@@ -31,9 +38,9 @@ async function requireUserClient() {
   return { supabase, user };
 }
 
-export async function addWatchlistItem(formData: FormData): Promise<void> {
+export async function addWatchlistItem(formData: FormData): Promise<MutationResult> {
   const urlName = normalizeUrlName(formData.get("urlName"));
-  if (!urlName) return;
+  if (!urlName) return { error: null };
 
   const { supabase, user } = await requireUserClient();
   const { error } = await supabase.from("watchlist").upsert(
@@ -42,12 +49,16 @@ export async function addWatchlistItem(formData: FormData): Promise<void> {
   );
 
   if (error) {
-    throw new Error(`addWatchlistItem: ${error.message}`);
+    if (error.code === "23514" || /watchlist limit reached/i.test(error.message)) {
+      return { error: `Watchlist limit reached (max ${MAX_WATCHLIST_PINS} pins per account).` };
+    }
+    return { error: "Could not pin item. Please try again." };
   }
 
   revalidatePath("/watchlist");
   revalidatePath("/");
   revalidatePath(`/items/${urlName}`);
+  return { error: null };
 }
 
 export interface ScanChunkResult {
@@ -56,13 +67,18 @@ export interface ScanChunkResult {
 }
 
 export async function scanItemChunk(urlNames: string[]): Promise<ScanChunkResult> {
-  if (!(await getAuthUser())) {
-    return { scanned: 0, failed: ["Sign in to sync catalog prices."] };
+  const user = await getAuthUser();
+  if (!isAdminUser(user)) {
+    return { scanned: 0, failed: [OWNER_ONLY_SCAN_ERROR] };
   }
 
-  const valid = (Array.isArray(urlNames) ? urlNames : [])
-    .filter((urlName) => typeof urlName === "string" && URL_NAME_PATTERN.test(urlName))
-    .slice(0, SCAN_CHUNK_MAX);
+  const valid = [
+    ...new Set(
+      (Array.isArray(urlNames) ? urlNames : []).filter(
+        (urlName) => typeof urlName === "string" && URL_NAME_PATTERN.test(urlName),
+      ),
+    ),
+  ].slice(0, SCAN_CHUNK_MAX);
 
   const supabase = createServiceClient();
   const thresholds = readThresholds();
@@ -87,8 +103,12 @@ export async function removeWatchlistItem(formData: FormData): Promise<void> {
   const urlName = normalizeUrlName(formData.get("urlName"));
   if (!urlName) return;
 
-  const { supabase } = await requireUserClient();
-  const { error } = await supabase.from("watchlist").delete().eq("url_name", urlName);
+  const { supabase, user } = await requireUserClient();
+  const { error } = await supabase
+    .from("watchlist")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("url_name", urlName);
 
   if (error) {
     throw new Error(`removeWatchlistItem: ${error.message}`);
@@ -99,15 +119,16 @@ export async function removeWatchlistItem(formData: FormData): Promise<void> {
   revalidatePath(`/items/${urlName}`);
 }
 
-export async function addModStashItem(formData: FormData): Promise<void> {
+export async function addModStashItem(formData: FormData): Promise<MutationResult> {
   const urlName = normalizeUrlName(formData.get("urlName"));
-  if (!urlName) return;
+  if (!urlName) return { error: null };
   const quantity = parseQuantity(formData.get("quantity"));
 
   const { supabase, user } = await requireUserClient();
   const { data: existing } = await supabase
     .from("mod_stash")
     .select("quantity")
+    .eq("user_id", user.id)
     .eq("url_name", urlName)
     .maybeSingle();
 
@@ -118,33 +139,48 @@ export async function addModStashItem(formData: FormData): Promise<void> {
   );
 
   if (error) {
-    throw new Error(`addModStashItem: ${error.message}`);
+    if (error.code === "23514" || /mod stash limit reached/i.test(error.message)) {
+      return { error: `Mod stash limit reached (max ${MAX_MOD_STASH_ITEMS} mods per account).` };
+    }
+    return { error: "Could not add mod to stash. Please try again." };
   }
 
   revalidatePath("/mods");
   revalidatePath("/");
+  return { error: null };
 }
 
-export async function bulkAddModStash(formData: FormData): Promise<void> {
+export async function bulkAddModStash(formData: FormData): Promise<MutationResult> {
   const raw = formData.get("bulk");
-  if (typeof raw !== "string" || !raw.trim()) return;
+  if (typeof raw !== "string" || !raw.trim()) return { error: null };
 
   const names = raw
     .split(/[\n,]+/)
     .map((part) => part.trim().toLowerCase().replace(/\s+/g, "_"))
     .filter((name) => URL_NAME_PATTERN.test(name));
 
-  if (names.length === 0) return;
+  if (names.length === 0) return { error: null };
 
   const { supabase, user } = await requireUserClient();
   const unique = [...new Set(names)].slice(0, 100);
 
-  const { data: existing } = await supabase
-    .from("mod_stash")
-    .select("url_name, quantity")
-    .in("url_name", unique);
+  const [{ data: existing }, { count: currentTotal }] = await Promise.all([
+    supabase
+      .from("mod_stash")
+      .select("url_name, quantity")
+      .eq("user_id", user.id)
+      .in("url_name", unique),
+    supabase.from("mod_stash").select("url_name", { count: "exact", head: true }),
+  ]);
 
   const qtyByUrl = new Map((existing ?? []).map((row) => [row.url_name, row.quantity]));
+  const newCount = unique.filter((urlName) => !qtyByUrl.has(urlName)).length;
+  if ((currentTotal ?? 0) + newCount > MAX_MOD_STASH_ITEMS) {
+    const remaining = Math.max(0, MAX_MOD_STASH_ITEMS - (currentTotal ?? 0));
+    return {
+      error: `Mod stash limit is ${MAX_MOD_STASH_ITEMS} mods (${remaining} slots left).`,
+    };
+  }
 
   const rows = unique.map((urlName) => ({
     user_id: user.id,
@@ -156,19 +192,27 @@ export async function bulkAddModStash(formData: FormData): Promise<void> {
     .from("mod_stash")
     .upsert(rows, { onConflict: "user_id,url_name" });
   if (error) {
-    throw new Error(`bulkAddModStash: ${error.message}`);
+    if (error.code === "23514" || /mod stash limit reached/i.test(error.message)) {
+      return { error: `Mod stash limit reached (max ${MAX_MOD_STASH_ITEMS} mods per account).` };
+    }
+    return { error: "Could not bulk-add mods. Please try again." };
   }
 
   revalidatePath("/mods");
   revalidatePath("/");
+  return { error: null };
 }
 
 export async function removeModStashItem(formData: FormData): Promise<void> {
   const urlName = normalizeUrlName(formData.get("urlName"));
   if (!urlName) return;
 
-  const { supabase } = await requireUserClient();
-  const { error } = await supabase.from("mod_stash").delete().eq("url_name", urlName);
+  const { supabase, user } = await requireUserClient();
+  const { error } = await supabase
+    .from("mod_stash")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("url_name", urlName);
 
   if (error) {
     throw new Error(`removeModStashItem: ${error.message}`);

@@ -235,33 +235,46 @@ async function handleScan(request: Request): Promise<NextResponse> {
   }
 
   const startedAt = Date.now();
+  const nowIso = new Date(startedAt).toISOString();
+  const staleCutoffIso = new Date(startedAt - RUNNING_LOCK_WINDOW_MS).toISOString();
   const supabase = createServiceClient();
 
-  const { data: cursorRow, error: cursorFetchError } = await supabase
+  const { data: claimedRow, error: claimError } = await supabase
     .from("scan_cursor")
-    .select("*")
+    .update({ status: "running", last_run_at: nowIso })
     .eq("id", 1)
-    .single();
+    .or(`status.neq.running,last_run_at.is.null,last_run_at.lt.${staleCutoffIso}`)
+    .select("*")
+    .maybeSingle();
 
-  if (cursorFetchError || !cursorRow) {
+  if (claimError) {
     return NextResponse.json(
-      { ok: false, error: `scan_cursor row missing: ${cursorFetchError?.message ?? "not found"}` },
+      { ok: false, error: `Failed to acquire scan lock: ${claimError.message}` },
       { status: 500 },
     );
   }
 
-  if (
-    cursorRow.status === "running" &&
-    cursorRow.last_run_at &&
-    Date.now() - new Date(cursorRow.last_run_at).getTime() < RUNNING_LOCK_WINDOW_MS
-  ) {
+  if (!claimedRow) {
+    const { data: existingRow, error: checkError } = await supabase
+      .from("scan_cursor")
+      .select("id")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (checkError || !existingRow) {
+      return NextResponse.json(
+        { ok: false, error: `scan_cursor row missing: ${checkError?.message ?? "not found"}` },
+        { status: 500 },
+      );
+    }
+
     return NextResponse.json(
       { ok: false, error: "Scan already running", skipped: true },
       { status: 409 },
     );
   }
 
-  await setCursorStatus(supabase, "running");
+  const cursorRow = claimedRow;
 
   const batchSize = envInt("SCAN_BATCH_SIZE", 20);
   const thresholds = readThresholds();

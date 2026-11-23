@@ -2,8 +2,10 @@ import { CatalogSyncButton } from "@/components/CatalogSyncButton";
 import { DucatsTable } from "@/components/DucatsTable";
 import { FilterChip } from "@/components/ui/FilterChip";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { isAdminUser } from "@/lib/auth/policy";
 import { getAllDucatUrlNames, getDucatBoard } from "@/lib/dashboard";
 import type { DucatSort } from "@/lib/dashboard/types";
+import { getAuthUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -18,7 +20,8 @@ export default async function DucatsPage({
 }) {
   const { sort: sortRaw } = await searchParams;
   const sort: DucatSort = sortRaw === "sell" ? "sell" : "plat_per_ducat";
-  const rows = await getDucatBoard(sort, 100);
+  const [rows, user] = await Promise.all([getDucatBoard(sort, 100), getAuthUser()]);
+  const canSync = isAdminUser(user);
   const syncUrls = getAllDucatUrlNames().slice(0, 80);
 
   return (
@@ -26,7 +29,7 @@ export default async function DucatsPage({
       <PageHeader
         title="Ducat efficiency"
         description="Compare market sell to fixed ducat value. Low plat/ducat → junk at Baro; high → sell on warframe.market. Live Baro shop is not tracked."
-        actions={<CatalogSyncButton label="prices" urlNames={syncUrls} />}
+        actions={canSync ? <CatalogSyncButton label="prices" urlNames={syncUrls} /> : undefined}
       />
 
       <div className="flex flex-wrap gap-2">

@@ -73,9 +73,11 @@ function SyndicateTable({ section }: { section: SyndicateSection }) {
 export function SyndicateBrowser({
   sections,
   initialHidden,
+  canSync = false,
 }: {
   sections: SyndicateSection[];
   initialHidden: string[];
+  canSync?: boolean;
 }) {
   const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set(initialHidden));
 
@@ -144,10 +146,12 @@ export function SyndicateBrowser({
                   {section.mods.length} mods
                 </span>
               </h2>
-              <SyndicateSyncButton
-                syndicate={section.syndicate}
-                urlNames={section.mods.map((mod) => mod.urlName)}
-              />
+              {canSync ? (
+                <SyndicateSyncButton
+                  syndicate={section.syndicate}
+                  urlNames={section.mods.map((mod) => mod.urlName)}
+                />
+              ) : null}
             </div>
             {section.unscanned ? (
               <p className="rounded-sm border border-line bg-void-raised px-4 py-3 text-xs text-platinum-faint">

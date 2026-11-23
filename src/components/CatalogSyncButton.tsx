@@ -33,8 +33,9 @@ export function CatalogSyncButton({
       const chunk = urlNames.slice(i, i + CHUNK_SIZE);
       try {
         const result = await scanItemChunk(chunk);
-        if (result.failed.includes("Sign in to sync catalog prices.")) {
-          setNotice("Sign in to sync catalog prices.");
+        const authFailure = result.failed.find((msg) => /sign in|owner access/i.test(msg));
+        if (authFailure) {
+          setNotice(authFailure);
           setProgress(null);
           return;
         }

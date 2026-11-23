@@ -2,8 +2,10 @@ import { CatalogSyncButton } from "@/components/CatalogSyncButton";
 import { RelicsTable } from "@/components/RelicsTable";
 import { FilterChip } from "@/components/ui/FilterChip";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { isAdminUser } from "@/lib/auth/policy";
 import { getAllRelicPartUrlNames, getRelicBoard } from "@/lib/dashboard";
 import { RELIC_ERAS } from "@/lib/dashboard/relics";
+import { getAuthUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
@@ -35,12 +37,16 @@ export default async function RelicsPage({
     params.vaulted === "vaulted" || params.vaulted === "unvaulted" ? params.vaulted : "all";
   const sort = params.sort === "intact" ? "intact" : "radiant";
 
-  const rows = await getRelicBoard({
-    era: era === "all" ? null : era,
-    vaulted,
-    sort,
-    limit: 80,
-  });
+  const [rows, user] = await Promise.all([
+    getRelicBoard({
+      era: era === "all" ? null : era,
+      vaulted,
+      sort,
+      limit: 80,
+    }),
+    getAuthUser(),
+  ]);
+  const canSync = isAdminUser(user);
 
   const allParts = getAllRelicPartUrlNames();
   const syncUrls = allParts.slice(0, 120);
@@ -50,7 +56,7 @@ export default async function RelicsPage({
       <PageHeader
         title="Relic value"
         description="Expected platinum from Intact / Radiant openings using current lowest sells. Run the high-EV relics; sync part prices if many rows show dashes."
-        actions={<CatalogSyncButton label="parts" urlNames={syncUrls} />}
+        actions={canSync ? <CatalogSyncButton label="parts" urlNames={syncUrls} /> : undefined}
       />
 
       <div className="flex flex-col gap-2">

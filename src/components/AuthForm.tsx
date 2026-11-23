@@ -13,9 +13,11 @@ const fieldClass =
 export function AuthForm({
   mode,
   next,
+  showSignupLink = true,
 }: {
   mode: "login" | "signup";
   next: string;
+  showSignupLink?: boolean;
 }) {
   const action = mode === "login" ? signIn : signUp;
   const [state, formAction, pending] = useActionState(action, INITIAL);
@@ -38,13 +40,20 @@ export function AuthForm({
         />
       </label>
       <label className="flex flex-col gap-1.5 text-sm text-platinum-dim">
-        Password
+        <span className="flex items-center justify-between">
+          <span>Password</span>
+          {mode === "login" ? (
+            <Link href="/forgot-password" className="text-xs text-platinum-faint hover:text-teal">
+              Forgot password?
+            </Link>
+          ) : null}
+        </span>
         <input
           className={fieldClass}
           type="password"
           name="password"
           autoComplete={mode === "login" ? "current-password" : "new-password"}
-          minLength={6}
+          minLength={mode === "signup" ? 10 : 1}
           required
         />
       </label>
@@ -57,12 +66,14 @@ export function AuthForm({
       >
         {pending ? "Working…" : mode === "login" ? "Sign in" : "Create account"}
       </button>
-      <p className="text-sm text-platinum-faint">
-        {mode === "login" ? "No account yet?" : "Already have one?"}{" "}
-        <Link href={otherHref} className="text-teal hover:underline">
-          {mode === "login" ? "Create one" : "Sign in"}
-        </Link>
-      </p>
+      {mode === "signup" || showSignupLink ? (
+        <p className="text-sm text-platinum-faint">
+          {mode === "login" ? "No account yet?" : "Already have one?"}{" "}
+          <Link href={otherHref} className="text-teal hover:underline">
+            {mode === "login" ? "Create one" : "Sign in"}
+          </Link>
+        </p>
+      ) : null}
     </form>
   );
 }

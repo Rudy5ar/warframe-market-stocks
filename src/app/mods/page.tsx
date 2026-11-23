@@ -5,6 +5,7 @@ import {
 import { DiscoveryTable, StashTable } from "@/components/ModsTables";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { SignInHint } from "@/components/ui/SignInHint";
+import { MAX_MOD_STASH_ITEMS } from "@/lib/config/limits";
 import { getMarketableMods, getModStash } from "@/lib/dashboard";
 import { DEFAULT_MIN_MOD_SELL_PLAT } from "@/lib/market";
 import { getAuthUser } from "@/lib/supabase/server";
@@ -31,7 +32,14 @@ export default async function ModsPage() {
       />
 
       <section className="flex flex-col gap-3">
-        <h2 className="font-display text-base font-semibold text-platinum">Your stash</h2>
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className="font-display text-base font-semibold text-platinum">Your stash</h2>
+          {user ? (
+            <span className="font-mono-num text-xs text-platinum-faint">
+              {stash.length} / {MAX_MOD_STASH_ITEMS} mods
+            </span>
+          ) : null}
+        </div>
         {user ? (
           <>
             <AddModStashForm />

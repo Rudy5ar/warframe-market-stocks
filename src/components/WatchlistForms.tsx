@@ -24,23 +24,32 @@ function AddSubmitButton() {
 export function AddWatchlistForm() {
   const formRef = useRef<HTMLFormElement>(null);
   const [pickerKey, setPickerKey] = useState(0);
+  const [error, setError] = useState<string | null>(null);
 
   return (
-    <form
-      ref={formRef}
-      action={async (formData) => {
-        await addWatchlistItem(formData);
-        formRef.current?.reset();
-        setPickerKey((key) => key + 1);
-      }}
-      className="flex gap-2"
-    >
-      <CatalogPicker
-        key={pickerKey}
-        placeholder="Search or paste a name, e.g. Saryn Prime Set"
-      />
-      <AddSubmitButton />
-    </form>
+    <div className="flex flex-col gap-2">
+      <form
+        ref={formRef}
+        action={async (formData) => {
+          setError(null);
+          const result = await addWatchlistItem(formData);
+          if (result.error) {
+            setError(result.error);
+            return;
+          }
+          formRef.current?.reset();
+          setPickerKey((key) => key + 1);
+        }}
+        className="flex gap-2"
+      >
+        <CatalogPicker
+          key={pickerKey}
+          placeholder="Search or paste a name, e.g. Saryn Prime Set"
+        />
+        <AddSubmitButton />
+      </form>
+      {error ? <p className="text-sm text-red">{error}</p> : null}
+    </div>
   );
 }
 
@@ -92,10 +101,27 @@ export function WatchlistToggleButton({
   urlName: string;
   isWatchlisted: boolean;
 }) {
+  const [error, setError] = useState<string | null>(null);
+
   return (
-    <form action={isWatchlisted ? removeWatchlistItem : addWatchlistItem}>
-      <input type="hidden" name="urlName" value={urlName} />
-      <ToggleSubmitButton isWatchlisted={isWatchlisted} />
-    </form>
+    <div className="flex flex-col items-end gap-1">
+      <form
+        action={async (formData) => {
+          setError(null);
+          if (isWatchlisted) {
+            await removeWatchlistItem(formData);
+            return;
+          }
+          const result = await addWatchlistItem(formData);
+          if (result.error) {
+            setError(result.error);
+          }
+        }}
+      >
+        <input type="hidden" name="urlName" value={urlName} />
+        <ToggleSubmitButton isWatchlisted={isWatchlisted} />
+      </form>
+      {error ? <p className="text-xs text-red">{error}</p> : null}
+    </div>
   );
 }

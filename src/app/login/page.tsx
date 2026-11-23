@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { AuthForm } from "@/components/AuthForm";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { safeNextPath } from "@/lib/auth/paths";
+import { isPublicSignupEnabled } from "@/lib/auth/policy";
 import { getAuthUser } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -15,12 +16,19 @@ export const metadata = {
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; error?: string }>;
 }) {
-  const next = safeNextPath((await searchParams).next);
+  const params = await searchParams;
+  const next = safeNextPath(params.next);
   if (await getAuthUser()) {
     redirect(next);
   }
+
+  const signupsOpen = isPublicSignupEnabled();
+  const callbackError =
+    params.error === "callback"
+      ? "Confirmation link expired or invalid. Please sign in or request a new link."
+      : null;
 
   return (
     <div className="mx-auto flex max-w-md flex-col gap-6">
@@ -28,7 +36,8 @@ export default async function LoginPage({
         title="Sign in"
         description="Your watchlist and mod stash stay on this account. Market boards are shared."
       />
-      <AuthForm mode="login" next={next} />
+      {callbackError ? <p className="text-sm text-red">{callbackError}</p> : null}
+      <AuthForm mode="login" next={next} showSignupLink={signupsOpen} />
       <p className="text-xs text-platinum-faint">
         Just browsing flips?{" "}
         <Link href="/" className="text-teal hover:underline">

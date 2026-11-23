@@ -75,7 +75,7 @@ export interface ScanStatusSummary {
   lastRunAt: string | null;
   totalItems: number;
   scannedItems: number;
-  watchlistCount: number;
+  watchlistCount: number | null;
   alertsToday: number;
 }
 

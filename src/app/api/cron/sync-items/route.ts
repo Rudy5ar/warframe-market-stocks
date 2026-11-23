@@ -50,7 +50,3 @@ async function handleSyncItems(request: Request): Promise<NextResponse> {
 export async function POST(request: Request): Promise<NextResponse> {
   return handleSyncItems(request);
 }
-
-export async function GET(request: Request): Promise<NextResponse> {
-  return handleSyncItems(request);
-}

@@ -1,5 +1,6 @@
 import { ScanStatusBadge } from "@/components/ScanStatusBadge";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { getProfileConfig } from "@/lib/config/profile";
 import { getScanStatus } from "@/lib/dashboard";
 import { formatDateTime, formatRelativeTime } from "@/lib/format";
 
@@ -11,14 +12,19 @@ export const metadata = {
 
 export default async function StatusPage() {
   const status = await getScanStatus();
+  const profile = getProfileConfig();
   const progressPct = status.totalItems > 0 ? (status.offset / status.totalItems) * 100 : 0;
 
   const rows: Array<{ label: string; value: string }> = [
+    { label: "Profile", value: profile.env },
+    { label: "Public signups", value: profile.allowPublicSignups ? "open" : "closed" },
     { label: "Cursor offset", value: `${status.offset} / ${status.totalItems}` },
     { label: "Last run", value: formatDateTime(status.lastRunAt) },
     { label: "Items in catalog", value: String(status.totalItems) },
     { label: "Items with a snapshot", value: String(status.scannedItems) },
-    { label: "Watchlist pins", value: String(status.watchlistCount) },
+    ...(status.watchlistCount !== null
+      ? [{ label: "Your watchlist pins", value: String(status.watchlistCount) }]
+      : []),
     { label: "Alerts today (UTC)", value: String(status.alertsToday) },
   ];
 

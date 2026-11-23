@@ -190,11 +190,17 @@ export async function getScanStatus(): Promise<ScanStatusSummary> {
   }
 
   const todayUtc = new Date().toISOString().slice(0, 10);
+  const userClient = await createUserClient();
+  const {
+    data: { user },
+  } = await userClient.auth.getUser();
 
   const [totalItems, scannedItems, watchlistCount, alertsToday] = await Promise.all([
     supabase.from("items").select("id", { count: "exact", head: true }),
     supabase.from("item_snapshots").select("url_name", { count: "exact", head: true }),
-    supabase.from("watchlist").select("url_name", { count: "exact", head: true }),
+    user
+      ? userClient.from("watchlist").select("url_name", { count: "exact", head: true })
+      : Promise.resolve({ count: null, error: null }),
     supabase
       .from("alerts")
       .select("id", { count: "exact", head: true })
@@ -213,7 +219,7 @@ export async function getScanStatus(): Promise<ScanStatusSummary> {
     lastRunAt: cursor.last_run_at,
     totalItems: totalItems.count ?? 0,
     scannedItems: scannedItems.count ?? 0,
-    watchlistCount: watchlistCount.count ?? 0,
+    watchlistCount: user ? (watchlistCount.count ?? 0) : null,
     alertsToday: alertsToday.count ?? 0,
   };
 }
