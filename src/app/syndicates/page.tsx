@@ -32,7 +32,7 @@ export default async function SyndicatesPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Syndicate augments"
-        description="Augment mods from the six base syndicates, sorted by current sell — leftover standing first. Prices come from scheduled scans."
+        description="All 198 base syndicate augments auto-refreshed every 30 minutes via live top orders, sorted by current in-game sell. Click Verify top 12 live to re-check a syndicate in 4 seconds."
       />
 
       {noData ? (

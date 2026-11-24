@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { isAdminUser } from "@/lib/auth/policy";
 import { MAX_MOD_STASH_ITEMS, MAX_WATCHLIST_PINS } from "@/lib/config/limits";
 import { searchCatalog } from "@/lib/dashboard/queries";
+import { fastRefreshTopOrders } from "@/lib/scan/fastSyndicateRefresh";
 import { readThresholds, scanOneItem } from "@/lib/scan/scanItem";
 import { createServiceClient, createUserClient, getAuthUser } from "@/lib/supabase/server";
 
@@ -96,7 +97,22 @@ export async function scanItemChunk(urlNames: string[]): Promise<ScanChunkResult
 }
 
 export async function scanSyndicateMods(urlNames: string[]): Promise<ScanChunkResult> {
-  return scanItemChunk(urlNames);
+  const user = await getAuthUser();
+  if (!isAdminUser(user)) {
+    return { scanned: 0, failed: [OWNER_ONLY_SCAN_ERROR] };
+  }
+
+  const valid = [
+    ...new Set(
+      (Array.isArray(urlNames) ? urlNames : []).filter(
+        (urlName) => typeof urlName === "string" && URL_NAME_PATTERN.test(urlName),
+      ),
+    ),
+  ].slice(0, SCAN_CHUNK_MAX);
+
+  const supabase = createServiceClient();
+  const summary = await fastRefreshTopOrders(supabase, valid, { timeBudgetMs: 25_000 });
+  return { scanned: summary.items.length, failed: summary.failed };
 }
 
 export async function removeWatchlistItem(formData: FormData): Promise<void> {

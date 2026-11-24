@@ -4,9 +4,9 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { RefreshCw } from "lucide-react";
 
-import { scanItemChunk } from "@/lib/dashboard/actions";
+import { scanSyndicateMods } from "@/lib/dashboard/actions";
 
-const CHUNK_SIZE = 10;
+const CHUNK_SIZE = 20;
 
 export function SyndicateSyncButton({
   syndicate,
@@ -30,7 +30,7 @@ export function SyndicateSyncButton({
     for (let i = 0; i < urlNames.length; i += CHUNK_SIZE) {
       const chunk = urlNames.slice(i, i + CHUNK_SIZE);
       try {
-        const result = await scanItemChunk(chunk);
+        const result = await scanSyndicateMods(chunk);
         failures += result.failed.length;
       } catch {
         failures += chunk.length;
@@ -71,7 +71,7 @@ export function SyndicateSyncButton({
         type="button"
         onClick={handleSync}
         disabled={urlNames.length === 0}
-        className="flex items-center gap-1.5 rounded-sm border border-line px-2.5 py-1 text-xs font-medium text-platinum-dim transition-colors hover:border-teal-dim hover:text-teal disabled:opacity-50"
+        className="flex items-center gap-1.5 rounded-lg border border-line bg-void-raised px-3 py-1.5 text-xs font-medium text-platinum-dim transition-colors hover:border-gold/40 hover:text-gold disabled:opacity-50"
       >
         <RefreshCw size={12} />
         Sync all ({urlNames.length})
