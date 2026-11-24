@@ -13,7 +13,7 @@ import { getAuthUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Don't dissolve — WF Stocks",
+  title: "Mods",
 };
 
 export default async function ModsPage() {

@@ -7,7 +7,7 @@ import { getAuthUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Choose new password — WF Stocks",
+  title: "Choose new password",
 };
 
 export default async function ResetPasswordPage() {
@@ -17,7 +17,7 @@ export default async function ResetPasswordPage() {
     <div className="mx-auto flex max-w-md flex-col gap-6">
       <PageHeader
         title="Choose a new password"
-        description="Use at least 10 characters for your WF Stocks account."
+        description="Use at least 10 characters for your Tenno Desk account."
       />
       {user ? (
         <ResetPasswordForm />

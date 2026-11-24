@@ -1,6 +1,7 @@
 import "server-only";
 
 import { createServiceClient } from "@/lib/supabase/server";
+import { getLiveDucatFeed } from "@/lib/wfm/live";
 
 import { RELIC_CATALOG, computeRelicEv } from "./relics";
 import type { RelicEntry } from "./relics";
@@ -15,8 +16,36 @@ async function loadPartPrices(
   const prices = new Map<string, number | null>();
   const CHUNK = 200;
 
+  const liveDucatFeed = await getLiveDucatFeed();
+
+  // Map url_name -> WFM item id so live /v1/tools/ducats prices cover all Prime drops in 1 call.
+  const idByUrl = new Map<string, string>();
   for (let i = 0; i < urlNames.length; i += CHUNK) {
     const chunk = urlNames.slice(i, i + CHUNK);
+    if (chunk.length === 0) continue;
+    const { data, error } = await supabase
+      .from("items")
+      .select("id, url_name")
+      .in("url_name", chunk);
+    if (error) throw new Error(`getRelicBoard: ${error.message}`);
+    for (const row of data ?? []) {
+      idByUrl.set(row.url_name, row.id);
+    }
+  }
+
+  const missingFromLive: string[] = [];
+  for (const urlName of urlNames) {
+    const itemId = idByUrl.get(urlName);
+    const live = itemId ? liveDucatFeed.get(itemId) : undefined;
+    if (live && live.median > 0) {
+      prices.set(urlName, live.median);
+    } else {
+      missingFromLive.push(urlName);
+    }
+  }
+
+  for (let i = 0; i < missingFromLive.length; i += CHUNK) {
+    const chunk = missingFromLive.slice(i, i + CHUNK);
     if (chunk.length === 0) continue;
     const { data, error } = await supabase
       .from("item_snapshots")

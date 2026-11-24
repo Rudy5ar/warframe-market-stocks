@@ -56,18 +56,34 @@ export interface ScannedItemResult {
   priceDropAlert: boolean;
 }
 
+const STATS_FRESH_MS = 12 * 60 * 60 * 1000;
+
 export async function scanOneItem(
   supabase: SupabaseClient<Database>,
   urlName: string,
   thresholds: ScanThresholds,
 ): Promise<ScannedItemResult> {
-  const orders = await getItemOrders(urlName);
+  const [orders, existingSnap] = await Promise.all([
+    getItemOrders(urlName),
+    supabase
+      .from("item_snapshots")
+      .select("median_48h, volume_48h, scanned_at")
+      .eq("url_name", urlName)
+      .maybeSingle(),
+  ]);
   const metrics: SpreadMetrics = computeSpreadMetrics(orders);
 
-  let median48h: number | null = null;
-  let volume48h: number | null = null;
+  let median48h: number | null = existingSnap.data?.median_48h ?? null;
+  let volume48h: number | null = existingSnap.data?.volume_48h ?? null;
 
-  if (thresholds.fetchStats) {
+  const statsAgeMs = existingSnap.data?.scanned_at
+    ? Date.now() - new Date(existingSnap.data.scanned_at).getTime()
+    : Number.POSITIVE_INFINITY;
+  const needStats =
+    thresholds.fetchStats &&
+    (median48h === null || volume48h === null || statsAgeMs > STATS_FRESH_MS);
+
+  if (needStats) {
     const stats = await getItemStatistics(urlName);
     median48h = computeMedian48h(stats);
     volume48h = stats.statistics_closed["48hours"].reduce(

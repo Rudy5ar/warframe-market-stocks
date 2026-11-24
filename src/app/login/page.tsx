@@ -10,7 +10,7 @@ import { getAuthUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Sign in — WF Stocks",
+  title: "Sign in",
 };
 
 export default async function LoginPage({

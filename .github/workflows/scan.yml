@@ -1,25 +1,41 @@
-# Primary scan scheduler (free tier). Runs every 4 hours on the hour (UTC).
+# Primary scan scheduler (free tier). Runs every 2 hours UTC, executing
+# multiple targeted batches focused on Syndicates, Mods, Watchlists, and catalog rotation.
+# Ducats, Relics, Live Deals, and Item Detail pages are fetched live with caching.
 # Backup: vercel.json daily cron at 06:00 UTC (Hobby 1/day limit).
-# Phase 2 /api/cron/scan must accept: Authorization: Bearer <CRON_SECRET>
 #
 # Repo secret: CRON_SECRET (same value as Vercel env)
 name: Scan cron
 
 on:
   schedule:
-    # Every 4 hours: 00:00, 04:00, 08:00, 12:00, 16:00, 20:00 UTC
-    - cron: "0 */4 * * *"
+    # Every 2 hours UTC
+    - cron: "0 */2 * * *"
   workflow_dispatch:
 
 jobs:
   trigger-scan:
     runs-on: ubuntu-latest
     steps:
-      - name: POST /api/cron/scan
+      - name: Run targeted scan batches
         env:
           APP_URL: https://warframe-market-stocks.vercel.app
           CRON_SECRET: ${{ secrets.CRON_SECRET }}
         run: |
-          curl -fsS -X POST \
-            -H "Authorization: Bearer ${CRON_SECRET}" \
-            "${APP_URL}/api/cron/scan"
+          for i in 1 2 3 4; do
+            echo "=== Batch $i ==="
+            status=$(curl -sS -o /tmp/scan_resp.json -w "%{http_code}" \
+              -X POST \
+              -H "Authorization: Bearer ${CRON_SECRET}" \
+              "${APP_URL}/api/cron/scan")
+            cat /tmp/scan_resp.json
+            echo ""
+            if [ "$status" -eq 409 ]; then
+              echo "Scan lock active; stopping early."
+              exit 0
+            fi
+            if [ "$status" -lt 200 ] || [ "$status" -ge 300 ]; then
+              echo "Scan batch $i failed with HTTP $status"
+              exit 1
+            fi
+            sleep 2
+          done

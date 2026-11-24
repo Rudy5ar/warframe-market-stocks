@@ -7,7 +7,7 @@ import { formatDateTime, formatRelativeTime } from "@/lib/format";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Status — WF Stocks",
+  title: "Status",
 };
 
 export default async function StatusPage() {
@@ -35,27 +35,27 @@ export default async function StatusPage() {
         description="Catalog scan progress and table counts."
       />
 
-      <div className="flex items-center gap-3 rounded-sm border border-line bg-void-raised px-4 py-3">
+      <div className="flex items-center gap-3 rounded-xl border border-line bg-void-raised px-4 py-3.5">
         <ScanStatusBadge status={status.status} />
         <span className="text-sm text-platinum-dim">
           Last run <span className="text-platinum">{formatRelativeTime(status.lastRunAt)}</span>
         </span>
       </div>
 
-      <div className="rounded-sm border border-line bg-void-raised px-4 py-3">
+      <div className="rounded-xl border border-line bg-void-raised px-4 py-3.5">
         <div className="mb-2 flex items-center justify-between text-xs text-platinum-faint">
           <span>Current cycle progress</span>
           <span className="font-mono-num">{progressPct.toFixed(0)}%</span>
         </div>
-        <div className="h-1.5 w-full overflow-hidden rounded-full bg-void-panel">
+        <div className="h-2 w-full overflow-hidden rounded-full bg-void-panel">
           <div
-            className="h-full bg-teal transition-[width]"
+            className="h-full bg-gold transition-[width]"
             style={{ width: `${Math.min(100, Math.max(0, progressPct))}%` }}
           />
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-sm border border-line bg-void-raised">
+      <div className="overflow-hidden rounded-xl border border-line bg-void-raised">
         <table className="w-full border-collapse text-sm">
           <tbody>
             {rows.map((row) => (

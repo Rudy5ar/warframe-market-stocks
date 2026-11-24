@@ -9,7 +9,7 @@ import { getAuthUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Syndicate augments — WF Stocks",
+  title: "Syndicates",
 };
 
 export default async function SyndicatesPage({

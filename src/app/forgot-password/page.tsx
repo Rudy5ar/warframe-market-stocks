@@ -8,7 +8,7 @@ import { getAuthUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Reset password — WF Stocks",
+  title: "Reset password",
 };
 
 export default async function ForgotPasswordPage() {

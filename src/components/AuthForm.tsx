@@ -8,7 +8,7 @@ import { signIn, signUp, type AuthFormState } from "@/lib/auth/actions";
 const INITIAL: AuthFormState = { error: null, message: null };
 
 const fieldClass =
-  "w-full rounded-sm border border-line bg-void-panel px-3 py-2 text-sm text-platinum placeholder:text-platinum-faint";
+  "w-full rounded-lg border border-line bg-void-panel px-3.5 py-2 text-sm text-platinum placeholder:text-platinum-faint transition-colors hover:border-line-strong focus:border-gold";
 
 export function AuthForm({
   mode,
@@ -62,14 +62,14 @@ export function AuthForm({
       <button
         type="submit"
         disabled={pending}
-        className="rounded-sm border border-teal-dim bg-teal-dim/10 px-3 py-2 text-sm font-medium text-teal transition-colors hover:bg-teal-dim/20 disabled:opacity-50"
+        className="rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-void transition-colors hover:bg-gold/90 disabled:opacity-50"
       >
         {pending ? "Working…" : mode === "login" ? "Sign in" : "Create account"}
       </button>
       {mode === "signup" || showSignupLink ? (
         <p className="text-sm text-platinum-faint">
           {mode === "login" ? "No account yet?" : "Already have one?"}{" "}
-          <Link href={otherHref} className="text-teal hover:underline">
+          <Link href={otherHref} className="font-medium text-gold hover:underline">
             {mode === "login" ? "Create one" : "Sign in"}
           </Link>
         </p>

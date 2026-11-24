@@ -5,7 +5,7 @@ import { getRecentAlerts } from "@/lib/dashboard";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Alerts — WF Stocks",
+  title: "Alerts",
 };
 
 export default async function AlertsPage() {

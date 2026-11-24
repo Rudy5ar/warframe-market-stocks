@@ -17,7 +17,7 @@ export function FilterInput({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       placeholder={placeholder}
-      className="w-full max-w-xs rounded-sm border border-line bg-void-panel px-3 py-1.5 text-sm text-platinum placeholder:text-platinum-faint"
+      className="w-full max-w-xs rounded-lg border border-line bg-void-panel px-3 py-1.5 text-sm text-platinum placeholder:text-platinum-faint transition-colors hover:border-line-strong focus:border-gold"
     />
   );
 }

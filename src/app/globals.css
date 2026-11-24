@@ -1,21 +1,25 @@
 @import "tailwindcss";
 
 :root {
-  --void: #0b0d0e;
-  --void-raised: #14191b;
-  --void-panel: #1b2124;
-  --line: #2c3538;
-  --line-strong: #3d484c;
+  --void: #0f1115;
+  --rail: #14171d;
+  --void-raised: #181c24;
+  --void-panel: #1f242f;
+  --line: #282e3b;
+  --line-strong: #3a4356;
 
-  --platinum: #e8edee;
-  --platinum-dim: #a8b3b5;
-  --platinum-faint: #6b7679;
+  --platinum: #f2efe9;
+  --platinum-dim: #a8b0be;
+  --platinum-faint: #788294;
 
-  --teal: #3ecfb8;
-  --teal-dim: #1f7568;
-  --amber: #e2a13d;
-  --amber-dim: #7a5a24;
-  --red: #d9705a;
+  --gold: #ddb764;
+  --gold-dim: #8f7338;
+  --teal: #4fd19b;
+  --teal-dim: #21664a;
+  --amber: #e5a94c;
+  --amber-dim: #7c5a22;
+  --red: #e86f5c;
+  --red-dim: #7a342a;
 
   --background: var(--void);
   --foreground: var(--platinum);
@@ -23,6 +27,7 @@
 
 @theme inline {
   --color-void: var(--void);
+  --color-rail: var(--rail);
   --color-void-raised: var(--void-raised);
   --color-void-panel: var(--void-panel);
   --color-line: var(--line);
@@ -32,22 +37,27 @@
   --color-platinum-dim: var(--platinum-dim);
   --color-platinum-faint: var(--platinum-faint);
 
+  --color-gold: var(--gold);
+  --color-gold-dim: var(--gold-dim);
   --color-teal: var(--teal);
   --color-teal-dim: var(--teal-dim);
   --color-amber: var(--amber);
   --color-amber-dim: var(--amber-dim);
   --color-red: var(--red);
+  --color-red-dim: var(--red-dim);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
 
-  --font-sans: var(--font-outfit);
-  --font-display: var(--font-syne);
-  --font-mono: var(--font-plex-mono);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-sora);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
-* {
-  border-color: var(--line);
+@layer base {
+  * {
+    border-color: var(--line);
+  }
 }
 
 html {
@@ -56,68 +66,33 @@ html {
 
 body {
   background-color: var(--void);
-  background-image:
-    radial-gradient(ellipse 80% 42% at 50% -8%, rgb(62 207 184 / 0.18), transparent 58%),
-    radial-gradient(ellipse 36% 28% at 100% 0%, rgb(226 161 61 / 0.09), transparent 52%);
-  background-attachment: fixed;
   color: var(--foreground);
   font-family: var(--font-sans);
+  caret-color: var(--gold);
 }
 
 ::selection {
-  background: var(--teal-dim);
+  background: rgb(221 183 100 / 0.28);
   color: var(--platinum);
 }
 
 :focus-visible {
-  outline: 1px solid var(--teal);
+  outline: 2px solid var(--gold);
   outline-offset: 2px;
 }
 
-.scan-filament {
-  position: relative;
-  height: 2px;
-  overflow: hidden;
-  background: var(--line);
-  box-shadow: 0 0 18px rgb(62 207 184 / 0.35);
+a {
+  text-underline-offset: 3px;
 }
 
-.scan-filament::after {
-  content: "";
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 22%;
-  background: var(--teal);
+dialog::backdrop {
+  background: rgb(8 10 14 / 0.78);
+  backdrop-filter: blur(4px);
 }
 
-.scan-filament[data-status="running"]::after {
-  width: 24%;
-  animation: filament-sweep 2.4s ease-in-out infinite;
-}
-
-.scan-filament[data-status="error"]::after {
-  width: 100%;
-  background: var(--red);
-}
-
-.scan-filament[data-status="error"] {
-  box-shadow: 0 0 18px rgb(217 112 90 / 0.4);
-}
-
-@keyframes filament-sweep {
-  0% {
-    transform: translateX(-120%);
-  }
-  100% {
-    transform: translateX(520%);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scan-filament[data-status="running"]::after {
-    animation: none;
-    width: 40%;
-  }
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
 .scroll-thin::-webkit-scrollbar {
@@ -129,7 +104,7 @@ body {
 }
 .scroll-thin::-webkit-scrollbar-thumb {
   background: var(--line-strong);
-  border-radius: 3px;
+  border-radius: 999px;
 }
 
 @layer utilities {
@@ -138,18 +113,7 @@ body {
   }
   .font-mono-num {
     font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
     font-feature-settings: "tnum" 1;
-  }
-  .lane-teal {
-    border-left: 3px solid var(--teal);
-    background: color-mix(in srgb, var(--teal-dim) 22%, var(--void-raised));
-  }
-  .lane-amber {
-    border-left: 3px solid var(--amber);
-    background: color-mix(in srgb, var(--amber-dim) 28%, var(--void-raised));
-  }
-  .lane-red {
-    border-left: 3px solid var(--red);
-    background: color-mix(in srgb, var(--red) 12%, var(--void-raised));
   }
 }

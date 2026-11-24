@@ -8,7 +8,7 @@ import { requestPasswordReset, type AuthFormState } from "@/lib/auth/actions";
 const INITIAL: AuthFormState = { error: null, message: null };
 
 const fieldClass =
-  "w-full rounded-sm border border-line bg-void-panel px-3 py-2 text-sm text-platinum placeholder:text-platinum-faint";
+  "w-full rounded-lg border border-line bg-void-panel px-3.5 py-2 text-sm text-platinum placeholder:text-platinum-faint transition-colors hover:border-line-strong focus:border-gold";
 
 export function ForgotPasswordForm() {
   const [state, formAction, pending] = useActionState(requestPasswordReset, INITIAL);
@@ -30,13 +30,13 @@ export function ForgotPasswordForm() {
       <button
         type="submit"
         disabled={pending}
-        className="rounded-sm border border-teal-dim bg-teal-dim/10 px-3 py-2 text-sm font-medium text-teal transition-colors hover:bg-teal-dim/20 disabled:opacity-50"
+        className="rounded-lg bg-gold px-4 py-2.5 text-sm font-semibold text-void transition-colors hover:bg-gold/90 disabled:opacity-50"
       >
         {pending ? "Sending…" : "Send reset link"}
       </button>
       <p className="text-sm text-platinum-faint">
         Remembered it?{" "}
-        <Link href="/login" className="text-teal hover:underline">
+        <Link href="/login" className="font-medium text-gold hover:underline">
           Back to sign in
         </Link>
       </p>

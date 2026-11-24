@@ -10,7 +10,7 @@ import { getAuthUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Relics — WF Stocks",
+  title: "Relics",
 };
 
 function filterHref(params: {

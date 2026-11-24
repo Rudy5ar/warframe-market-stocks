@@ -2,12 +2,15 @@ import "server-only";
 
 import { DEFAULT_SPREAD_THRESHOLDS } from "@/lib/market";
 import { createServiceClient, createUserClient } from "@/lib/supabase/server";
+import { buildWfmWhisper, getLiveDucatFeed, getLiveRecentOrders } from "@/lib/wfm/live";
 
 import { SYNDICATES, findSyndicateMod } from "./syndicates";
 import type { SyndicateModEntry } from "./syndicates";
 import type {
   AlertRow,
   CatalogHit,
+  DealMode,
+  DealRow,
   HistoryPoint,
   ItemDetail,
   OpportunityRow,
@@ -438,4 +441,250 @@ export async function searchCatalog(query: string, limit = 8): Promise<CatalogHi
     itemName: row.item_name,
     thumb: row.thumb,
   }));
+}
+
+export async function fetchSparklines(urlNames: string[]): Promise<Map<string, number[]>> {
+  const map = new Map<string, number[]>();
+  if (urlNames.length === 0) return map;
+
+  const supabase = createServiceClient();
+  const { data, error } = await supabase
+    .from("item_snapshot_history")
+    .select("url_name, lowest_sell, scanned_at")
+    .in("url_name", urlNames)
+    .order("scanned_at", { ascending: true });
+
+  if (error) {
+    return map;
+  }
+
+  for (const row of data ?? []) {
+    if (row.lowest_sell === null) continue;
+    const list = map.get(row.url_name);
+    if (list) {
+      list.push(row.lowest_sell);
+    } else {
+      map.set(row.url_name, [row.lowest_sell]);
+    }
+  }
+  return map;
+}
+
+export async function getLiveRecentDeals(limit = 40, minVolume = 5): Promise<DealRow[]> {
+  const [recentOrders, ducatFeed] = await Promise.all([
+    getLiveRecentOrders(),
+    getLiveDucatFeed(),
+  ]);
+
+  const ingameSells = recentOrders.filter(
+    (order) => order.type === "sell" && order.user.status === "ingame" && order.platinum >= 3,
+  );
+  if (ingameSells.length === 0) return [];
+
+  const itemIds = [...new Set(ingameSells.map((order) => order.itemId))];
+  const supabase = createServiceClient();
+
+  const { data: itemRows, error: itemsError } = await supabase
+    .from("items")
+    .select("id, url_name, item_name, thumb")
+    .in("id", itemIds);
+  if (itemsError) return [];
+
+  const itemById = new Map(
+    (itemRows ?? []).map((row) => [
+      row.id,
+      { urlName: row.url_name, itemName: row.item_name, thumb: row.thumb },
+    ]),
+  );
+
+  const urlNames = [...new Set((itemRows ?? []).map((row) => row.url_name))];
+  const { data: snapRows } =
+    urlNames.length > 0
+      ? await supabase
+          .from("item_snapshots")
+          .select("url_name, median_48h, volume_48h, spread, roi_pct")
+          .in("url_name", urlNames)
+      : { data: [] };
+
+  const snapByUrl = new Map((snapRows ?? []).map((row) => [row.url_name, row]));
+
+  const bestByUrl = new Map<string, { deal: DealRow; score: number }>();
+
+  for (const order of ingameSells) {
+    const item = itemById.get(order.itemId);
+    if (!item) continue;
+
+    const unitPrice = Math.round(order.platinum / order.perTrade);
+    if (unitPrice < 3) continue;
+
+    const ducat = ducatFeed.get(order.itemId);
+    const snap = snapByUrl.get(item.urlName);
+
+    const baseline =
+      ducat && ducat.median > 0
+        ? ducat.median
+        : snap?.median_48h && snap.median_48h > 0
+          ? snap.median_48h
+          : null;
+    const volume = Math.max(ducat?.volume ?? 0, snap?.volume_48h ?? 0);
+
+    if (baseline === null || baseline < 5 || volume < minVolume) continue;
+
+    const ratio = (unitPrice - baseline) / baseline;
+    // Guard against rank-0 vs max-rank mismatches on arcanes & primed mods.
+    if (ratio > -0.1 || ratio < -0.62 || baseline - unitPrice < 3) continue;
+
+    const diffPlat = Math.round(unitPrice - baseline);
+    const diffPct = Math.round(ratio * 100);
+    const score = Math.abs(ratio) * Math.log10(volume + 3) * (1 + Math.min(30, baseline - unitPrice) / 35);
+
+    const existing = bestByUrl.get(item.urlName);
+    if (existing && existing.deal.lowestSell <= unitPrice) continue;
+
+    bestByUrl.set(item.urlName, {
+      score,
+      deal: {
+        urlName: item.urlName,
+        itemName: item.itemName,
+        thumb: item.thumb,
+        lowestSell: unitPrice,
+        median48h: baseline,
+        diffPlat,
+        diffPct,
+        spread: snap?.spread ?? null,
+        roiPct: snap?.roi_pct ?? null,
+        volume48h: volume,
+        scannedAt: order.createdAt,
+        call: "grab",
+        isLive: true,
+        sellerName: order.user.ingameName,
+        rank: order.rank,
+        whisper: buildWfmWhisper(order.user.ingameName, item.itemName, unitPrice, order.rank),
+      },
+    });
+  }
+
+  return [...bestByUrl.values()]
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((entry) => entry.deal);
+}
+
+export async function getMarketDeals(
+  mode: DealMode = "live",
+  limit = 60,
+  minVolume = 5,
+): Promise<DealRow[]> {
+  if (mode === "live") {
+    return getLiveRecentDeals(limit, minVolume);
+  }
+
+  const supabase = createServiceClient();
+
+  if (mode === "spread") {
+    const { minSpread, minRoiPct } = opportunityThresholds();
+    const { data, error } = await supabase
+      .from("item_snapshots")
+      .select("url_name, lowest_sell, median_48h, spread, roi_pct, volume_48h, scanned_at")
+      .gte("spread", minSpread)
+      .gte("roi_pct", minRoiPct)
+      .gte("volume_48h", minVolume)
+      .not("lowest_sell", "is", null)
+      .order("spread", { ascending: false })
+      .limit(limit);
+
+    if (error) throw new Error(`getMarketDeals: ${error.message}`);
+    const rows = data ?? [];
+    const items = await fetchItemNamesByUrlName(
+      supabase,
+      rows.map((r) => r.url_name),
+    );
+    return rows.map((row) => {
+      const lowest = row.lowest_sell ?? 0;
+      const med = row.median_48h;
+      const diffPlat = med !== null ? Math.round(lowest - med) : null;
+      const diffPct = med !== null && med > 0 ? Math.round(((lowest - med) / med) * 100) : null;
+      const meta = items.get(row.url_name);
+      return {
+        urlName: row.url_name,
+        itemName: meta?.itemName ?? row.url_name,
+        thumb: meta?.thumb ?? null,
+        lowestSell: lowest,
+        median48h: med,
+        diffPlat,
+        diffPct,
+        spread: row.spread,
+        roiPct: row.roi_pct,
+        volume48h: row.volume_48h ?? 0,
+        scannedAt: row.scanned_at,
+        call: "flip",
+      };
+    });
+  }
+
+  const { data, error } = await supabase
+    .from("item_snapshots")
+    .select("url_name, lowest_sell, median_48h, spread, roi_pct, volume_48h, scanned_at")
+    .gte("volume_48h", minVolume)
+    .gte("lowest_sell", mode === "cheap" ? 3 : 10)
+    .gte("median_48h", 5)
+    .order("volume_48h", { ascending: false })
+    .limit(500);
+
+  if (error) throw new Error(`getMarketDeals: ${error.message}`);
+
+  const scored: Array<{
+    row: NonNullable<typeof data>[number];
+    diffPlat: number;
+    diffPct: number;
+    score: number;
+  }> = [];
+
+  for (const row of data ?? []) {
+    const lowest = row.lowest_sell;
+    const med = row.median_48h;
+    const vol = row.volume_48h ?? 0;
+    if (lowest === null || med === null || med <= 0) continue;
+
+    const diffPlat = Math.round(lowest - med);
+    const ratio = (lowest - med) / med;
+    const diffPct = Math.round(ratio * 100);
+
+    if (mode === "cheap") {
+      // Cap at -65% to exclude Rank-0 vs Max-Rank Arcane/Mod mismatches in 48h stats.
+      if (ratio <= -0.12 && ratio >= -0.65 && med - lowest >= 3) {
+        const discount = Math.abs(ratio);
+        const score = discount * Math.log10(vol + 3) * (1 + Math.min(25, med - lowest) / 40);
+        scored.push({ row, diffPlat, diffPct, score });
+      }
+    } else if (ratio >= 0.15 && ratio <= 1.5 && lowest - med >= 4) {
+      const score = ratio * Math.log10(vol + 3) * (1 + Math.min(40, lowest - med) / 50);
+      scored.push({ row, diffPlat, diffPct, score });
+    }
+  }
+
+  scored.sort((a, b) => b.score - a.score);
+  const top = scored.slice(0, limit);
+  const items = await fetchItemNamesByUrlName(
+    supabase,
+    top.map((entry) => entry.row.url_name),
+  );
+
+  return top.map(({ row, diffPlat, diffPct }) => {
+    const meta = items.get(row.url_name);
+    return {
+      urlName: row.url_name,
+      itemName: meta?.itemName ?? row.url_name,
+      thumb: meta?.thumb ?? null,
+      lowestSell: row.lowest_sell ?? 0,
+      median48h: row.median_48h,
+      diffPlat,
+      diffPct,
+      spread: row.spread,
+      roiPct: row.roi_pct,
+      volume48h: row.volume_48h ?? 0,
+      scannedAt: row.scanned_at,
+      call: mode === "cheap" ? "grab" : "spike",
+    };
+  });
 }

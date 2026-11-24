@@ -13,10 +13,10 @@ export function FilterChip({
   return (
     <Link
       href={href}
-      className={`rounded-sm border px-2.5 py-1 text-sm transition-colors ${
+      className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors ${
         active
-          ? "border-teal-dim bg-teal-dim/25 text-teal"
-          : "border-line bg-void-raised text-platinum-faint hover:text-platinum-dim"
+          ? "border-gold/45 bg-gold/15 text-gold"
+          : "border-line bg-void-raised text-platinum-dim hover:border-line-strong hover:text-platinum"
       }`}
     >
       {children}

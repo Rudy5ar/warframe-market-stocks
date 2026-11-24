@@ -124,7 +124,29 @@ export interface ItemDetail {
   alerts: AlertRow[];
 }
 
-export type DucatSort = "plat_per_ducat" | "sell";
+export type DealMode = "live" | "cheap" | "spike" | "spread";
+
+export interface DealRow {
+  urlName: string;
+  itemName: string;
+  thumb: string | null;
+  lowestSell: number;
+  median48h: number | null;
+  diffPlat: number | null;
+  diffPct: number | null;
+  spread: number | null;
+  roiPct: number | null;
+  volume48h: number;
+  scannedAt: string;
+  call: "grab" | "spike" | "flip";
+  sparkline?: number[];
+  isLive?: boolean;
+  sellerName?: string | null;
+  rank?: number | null;
+  whisper?: string | null;
+}
+
+export type DucatSort = "ducats_per_plat" | "sell_plat" | "highest_plat";
 
 export interface DucatBoardRow {
   urlName: string;
@@ -135,7 +157,8 @@ export interface DucatBoardRow {
   volume48h: number | null;
   scannedAt: string | null;
   platPerDucat: number | null;
-  recommendation: "sell" | "junk" | "unknown";
+  ducatsPerPlat: number | null;
+  recommendation: "sell" | "borderline" | "junk" | "unknown";
 }
 
 export interface RelicBoardRow {

@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ItemThumb } from "@/components/ui/ItemThumb";
+import { ItemPreviewThumb } from "@/components/ui/ItemPreviewThumb";
 
 export function ItemNameLink({
   urlName,
@@ -14,17 +14,17 @@ export function ItemNameLink({
   orphan?: boolean;
 }) {
   return (
-    <Link
-      href={`/items/${urlName}`}
-      className="flex items-center gap-2.5 text-platinum hover:text-teal"
-    >
-      <ItemThumb thumb={thumb} />
-      <span className="flex min-w-0 flex-col">
-        <span className="truncate">{name}</span>
+    <div className="flex min-w-0 items-center gap-2.5">
+      <ItemPreviewThumb urlName={urlName} itemName={name} thumb={thumb} size={32} />
+      <Link
+        href={`/items/${urlName}`}
+        className="flex min-w-0 flex-col text-platinum transition-colors hover:text-gold"
+      >
+        <span className="truncate font-medium">{name}</span>
         {orphan ? (
-          <span className="text-[10px] uppercase tracking-wide text-amber">pending sync</span>
+          <span className="text-[10px] tracking-wide text-amber uppercase">pending sync</span>
         ) : null}
-      </span>
-    </Link>
+      </Link>
+    </div>
   );
 }

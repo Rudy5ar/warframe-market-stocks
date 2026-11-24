@@ -9,7 +9,7 @@ import { getAuthUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Watchlist — WF Stocks",
+  title: "Watchlist",
 };
 
 export default async function WatchlistPage() {

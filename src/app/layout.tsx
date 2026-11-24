@@ -1,31 +1,34 @@
 import type { Metadata } from "next";
-import { IBM_Plex_Mono, Outfit, Syne } from "next/font/google";
+import { Inter, JetBrains_Mono, Sora } from "next/font/google";
 
 import { SiteHeader } from "@/components/SiteHeader";
 
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
-const syne = Syne({
-  variable: "--font-syne",
+const sora = Sora({
+  variable: "--font-sora",
   subsets: ["latin"],
-  weight: ["700", "800"],
+  weight: ["600", "700"],
 });
 
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
   subsets: ["latin"],
-  weight: ["400", "500"],
+  weight: ["400", "500", "600"],
 });
 
 export const metadata: Metadata = {
-  title: "WF Stocks — Platinum Monitor",
+  title: {
+    default: "Tenno Desk — Warframe Market Companion",
+    template: "%s — Tenno Desk",
+  },
   description:
-    "Warframe.market platinum flip and price-drop monitor. Shared market boards; your watchlist and mod stash stay on your account.",
+    "Second-monitor Warframe.market companion: honest liquidity-backed deals, Syndicate standing value, Baro Ducats per plat, Relics EV, and Mod Stash.",
 };
 
 export default function RootLayout({
@@ -36,10 +39,14 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${outfit.variable} ${syne.variable} ${plexMono.variable} min-h-screen antialiased`}
+        className={`${inter.variable} ${sora.variable} ${jetbrainsMono.variable} min-h-screen antialiased`}
       >
-        <SiteHeader />
-        <main className="relative mx-auto max-w-6xl px-4 py-8 sm:px-6">{children}</main>
+        <div className="min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
+          <SiteHeader />
+          <main className="min-w-0 px-4 py-6 sm:px-7 lg:px-9 lg:py-8">
+            <div className="mx-auto max-w-[1220px]">{children}</div>
+          </main>
+        </div>
       </body>
     </html>
   );

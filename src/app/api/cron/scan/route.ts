@@ -4,6 +4,8 @@ import { NextResponse } from "next/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { isAuthorizedCronRequest } from "@/lib/cron/auth";
+import { isFodderMod } from "@/lib/dashboard/fodderMods";
+import { findSyndicateMod } from "@/lib/dashboard/syndicates";
 import { pruneSnapshotHistory } from "@/lib/market";
 import { readThresholds, scanOneItem } from "@/lib/scan/scanItem";
 import type { ScanThresholds } from "@/lib/scan/scanItem";
@@ -15,9 +17,10 @@ export const dynamic = "force-dynamic";
 const TIME_BUDGET_MS = 45_000;
 const RUNNING_LOCK_WINDOW_MS = 15 * 60 * 1000;
 const WATCHLIST_STALE_MS = 3 * 60 * 60 * 1000;
+const PRIORITY_CATALOG_STALE_MS = 4 * 60 * 60 * 1000;
 const HISTORY_RETENTION_DAYS = 7;
-const MAX_EXTRA_BATCHES = 1;
-const WATCHLIST_BATCH_FRACTION = 0.5;
+const MAX_EXTRA_BATCHES = 2;
+const WATCHLIST_BATCH_FRACTION = 0.75;
 
 function envInt(name: string, fallback: number): number {
   const raw = process.env[name];
@@ -42,47 +45,68 @@ async function buildPriorityBatch(
     throw new Error(`Failed to read mod_stash: ${stashResult.error.message}`);
   }
 
-  const pinnedUrlNames = [
-    ...new Set([
-      ...(watchlistResult.data ?? []).map((pin) => pin.url_name),
-      ...(stashResult.data ?? []).map((pin) => pin.url_name),
-    ]),
-  ];
-  if (pinnedUrlNames.length === 0) return [];
+  const pinnedUrlNames = new Set([
+    ...(watchlistResult.data ?? []).map((pin) => pin.url_name),
+    ...(stashResult.data ?? []).map((pin) => pin.url_name),
+  ]);
 
-  const { data: existingItems, error: itemsError } = await supabase
-    .from("items")
-    .select("url_name")
-    .in("url_name", pinnedUrlNames);
-  if (itemsError) {
-    throw new Error(`Failed to resolve priority items: ${itemsError.message}`);
+  // Also prioritize all Syndicate augments and casual fodder rare mods (Ducats & Relics are live via /v1/tools/ducats).
+  const syndicateAndModUrls = new Set<string>();
+  const existingSet = new Set<string>();
+  const PAGE = 1000;
+  let offset = 0;
+  for (;;) {
+    const { data: itemsPage, error: itemsError } = await supabase
+      .from("items")
+      .select("url_name, item_name")
+      .order("url_name", { ascending: true })
+      .range(offset, offset + PAGE - 1);
+    if (itemsError) {
+      throw new Error(`Failed to resolve priority items: ${itemsError.message}`);
+    }
+    for (const item of itemsPage ?? []) {
+      existingSet.add(item.url_name);
+      if (findSyndicateMod(item.item_name) || isFodderMod(item.item_name)) {
+        syndicateAndModUrls.add(item.url_name);
+      }
+    }
+    if (!itemsPage || itemsPage.length < PAGE) break;
+    offset += PAGE;
   }
 
-  const existingSet = new Set((existingItems ?? []).map((item) => item.url_name));
-  const presentUrlNames = pinnedUrlNames.filter((urlName) => existingSet.has(urlName));
-  if (presentUrlNames.length === 0) return [];
+  const candidateUrlNames = [
+    ...new Set([...pinnedUrlNames, ...syndicateAndModUrls]),
+  ].filter((urlName) => existingSet.has(urlName));
+  if (candidateUrlNames.length === 0) return [];
 
-  const { data: snapshots, error: snapshotsError } = await supabase
-    .from("item_snapshots")
-    .select("url_name, scanned_at")
-    .in("url_name", presentUrlNames);
-  if (snapshotsError) {
-    throw new Error(`Failed to read priority snapshots: ${snapshotsError.message}`);
+  const scannedAtByUrlName = new Map<string, string>();
+  const CHUNK = 200;
+  for (let i = 0; i < candidateUrlNames.length; i += CHUNK) {
+    const chunk = candidateUrlNames.slice(i, i + CHUNK);
+    const { data: snapshots, error: snapshotsError } = await supabase
+      .from("item_snapshots")
+      .select("url_name, scanned_at")
+      .in("url_name", chunk);
+    if (snapshotsError) {
+      throw new Error(`Failed to read priority snapshots: ${snapshotsError.message}`);
+    }
+    for (const snapshot of snapshots ?? []) {
+      scannedAtByUrlName.set(snapshot.url_name, snapshot.scanned_at);
+    }
   }
 
-  const scannedAtByUrlName = new Map(
-    (snapshots ?? []).map((snapshot) => [snapshot.url_name, snapshot.scanned_at]),
-  );
   const now = Date.now();
 
-  return presentUrlNames
+  return candidateUrlNames
     .map((urlName) => {
       const scannedAt = scannedAtByUrlName.get(urlName);
       const ageMs = scannedAt ? now - new Date(scannedAt).getTime() : Number.POSITIVE_INFINITY;
-      return { urlName, ageMs };
+      const isUserPin = pinnedUrlNames.has(urlName);
+      const staleLimit = isUserPin ? WATCHLIST_STALE_MS : PRIORITY_CATALOG_STALE_MS;
+      return { urlName, ageMs, isUserPin, isStale: ageMs > staleLimit };
     })
-    .filter((entry) => entry.ageMs > WATCHLIST_STALE_MS)
-    .sort((a, b) => b.ageMs - a.ageMs)
+    .filter((entry) => entry.isStale)
+    .sort((a, b) => Number(b.isUserPin) - Number(a.isUserPin) || b.ageMs - a.ageMs)
     .slice(0, limit)
     .map((entry) => entry.urlName);
 }

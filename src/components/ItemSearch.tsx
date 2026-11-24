@@ -64,7 +64,7 @@ export function ItemSearch() {
         </label>
         <Search
           size={14}
-          className="pointer-events-none absolute top-1/2 left-2.5 -translate-y-1/2 text-platinum-faint"
+          className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-platinum-faint"
           aria-hidden
         />
         <input
@@ -73,19 +73,19 @@ export function ItemSearch() {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           onFocus={() => hits.length > 0 && setOpen(true)}
-          placeholder="Search items…"
+          placeholder="Search items, mods…"
           autoComplete="off"
-          className="w-full rounded-sm border border-line bg-void-panel py-1.5 pr-3 pl-8 text-sm text-platinum placeholder:text-platinum-faint"
+          className="w-full rounded-lg border border-line bg-void py-2 pr-3 pl-8 text-sm text-platinum placeholder:text-platinum-faint transition-colors hover:border-line-strong focus:border-gold"
         />
       </form>
       {open && hits.length > 0 ? (
-        <ul className="absolute z-30 mt-1 max-h-72 w-full overflow-auto rounded-sm border border-line bg-void-raised py-1 shadow-lg">
+        <ul className="absolute z-40 mt-1.5 max-h-72 w-full min-w-[220px] overflow-auto rounded-xl border border-line-strong bg-void-raised p-1 shadow-xl">
           {hits.map((hit) => (
             <li key={hit.urlName}>
               <button
                 type="button"
                 onClick={() => go(hit.urlName)}
-                className="flex w-full items-center gap-2 px-2 py-1.5 text-left text-sm text-platinum hover:bg-void-panel"
+                className="flex w-full items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm text-platinum transition-colors hover:bg-void-panel"
               >
                 <ItemThumb thumb={hit.thumb} size={24} />
                 <span className="truncate">{hit.itemName}</span>

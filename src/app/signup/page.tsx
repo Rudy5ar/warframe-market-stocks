@@ -10,7 +10,7 @@ import { getAuthUser } from "@/lib/supabase/server";
 export const dynamic = "force-dynamic";
 
 export const metadata = {
-  title: "Create account — WF Stocks",
+  title: "Create account",
 };
 
 export default async function SignupPage({
@@ -32,7 +32,7 @@ export default async function SignupPage({
         description={
           signupsOpen
             ? "Pins and stash are yours. Everyone still sees the same scan of the market."
-            : "Account registration is currently closed while WF Stocks is in private mode."
+            : "Account registration is currently closed while Tenno Desk is in private mode."
         }
       />
       {signupsOpen ? (
